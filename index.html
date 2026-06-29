@@ -903,9 +903,17 @@ const LAAM_CONTRACT = "0x10efbaaa20fdcfc7da729c09daf4c4daa3a1f89b";
         fetchJSON(`${base}&module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=1&sort=desc&apikey=${BASESCAN_API_KEY}`)
       ]);
 
-      const ethBalance = ethBalRes.result ? (parseFloat(ethBalRes.result) / 1e18).toFixed(5) : '0';
-      const laamBalanceRaw = tokenBalRes.result ? parseFloat(tokenBalRes.result) / 1e18 : 0;
-      const laamBalance = laamBalanceRaw.toFixed(2);
+      // Etherscan returns status "1" on success; result holds the value.
+      // On failure, result is often an error string (e.g. "Max rate limit reached"), which is why NaN can show up.
+      const ethRaw = (ethBalRes && ethBalRes.status === "1" && !isNaN(ethBalRes.result)) ? Number(ethBalRes.result) : null;
+      const laamRaw = (tokenBalRes && tokenBalRes.status === "1" && !isNaN(tokenBalRes.result)) ? Number(tokenBalRes.result) : null;
+
+      const ethBalance = ethRaw !== null ? (ethRaw / 1e18).toFixed(5) : 'N/A';
+      const laamBalanceRaw = laamRaw !== null ? laamRaw / 1e18 : 0;
+      const laamBalance = laamRaw !== null ? laamBalanceRaw.toFixed(2) : 'N/A';
+
+      if(ethRaw === null) console.warn('ETH balance error:', ethBalRes);
+      if(laamRaw === null) console.warn('LAAM balance error:', tokenBalRes);
 
       const txCountRes = await fetchJSON(`${base}&module=proxy&action=eth_getTransactionCount&address=${addr}&tag=latest&apikey=${BASESCAN_API_KEY}`);
       const txCount = txCountRes.result ? parseInt(txCountRes.result, 16) : 0;
