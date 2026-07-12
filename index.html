@@ -55,7 +55,7 @@ nav{
   font-size:.82rem;font-weight:700;color:var(--teal);transition:all .2s;
 }
 .nav-cta:hover{background:var(--teal);color:#040a0f;}
-@media(max-width:820px){.nav-links{display:none;}}
+
 
 /* HERO */
 header.hero{
@@ -146,7 +146,7 @@ h1.htitle{
   background:var(--teal-glow);border:1px solid var(--line);}
 .about-card h3{font-family:'Orbitron',sans-serif;font-size:1rem;color:var(--teal);margin-bottom:8px;}
 .about-card p{color:var(--dim);font-size:.9rem;line-height:1.6;}
-@media(max-width:820px){.about-grid{grid-template-columns:1fr;}}
+
 
 /* TOOLS */
 .tools-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
@@ -160,8 +160,8 @@ h1.htitle{
   display:flex;align-items:center;justify-content:center;font-size:.95rem;
   background:var(--teal-glow);border:1px solid var(--line);}
 .tool-pill span{font-size:.83rem;color:var(--white);font-weight:600;}
-@media(max-width:820px){.tools-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:480px){.tools-grid{grid-template-columns:1fr;}}
+
+
 
 /* TIERS */
 .tiers-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
@@ -182,12 +182,12 @@ h1.htitle{
 .tier-name{font-size:.9rem;font-weight:700;color:var(--white);}
 .tier-desc{font-size:.8rem;color:var(--dim);line-height:1.55;flex:1;}
 .tier-badge{font-family:'Space Mono',monospace;font-size:.66rem;color:var(--teal);letter-spacing:.06em;text-transform:uppercase;}
-@media(max-width:820px){.tiers-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:480px){.tiers-grid{grid-template-columns:1fr;}}
+
+
 
 /* LIVE DEMO TOOLS */
 .demo-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:22px;}
-@media(max-width:820px){.demo-grid{grid-template-columns:1fr;}}
+
 .demo-card{
   background:linear-gradient(160deg,var(--panel),var(--panel2));
   border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:14px;
@@ -331,6 +331,134 @@ footer{
 
 ::selection{background:var(--teal);color:#040a0f;}
 
+
+/* HAMBURGER MOBILE MENU */
+.ham-btn{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
+.ham-btn span{width:22px;height:2px;background:var(--teal);border-radius:2px;transition:all .25s;}
+.mob-menu{
+  display:none;position:fixed;top:58px;left:0;right:0;z-index:49;
+  background:rgba(4,10,15,0.97);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);padding:20px 5vw;
+  flex-direction:column;gap:20px;
+}
+.mob-menu.open{display:flex;}
+.mob-menu a{font-size:1rem;color:var(--dim);letter-spacing:.04em;transition:color .2s;}
+.mob-menu a:hover{color:var(--teal);}
+.mob-menu .mob-cta{
+  border:1px solid var(--teal);padding:12px 20px;border-radius:999px;
+  font-size:.9rem;font-weight:700;color:var(--teal);text-align:center;
+}
+@media(max-width:820px){
+  .ham-btn{display:flex;}
+}
+
+/* ========== MOBILE FIRST RESPONSIVE ========== */
+@media(max-width:820px){
+  /* NAV */
+  .nav-links{display:none;}
+  nav{padding:14px 4vw;}
+  .nav-cta{padding:7px 14px;font-size:.78rem;}
+
+  /* HERO */
+  header.hero{padding:110px 5vw 60px;}
+  .hero-coin{width:160px;height:160px;margin-bottom:24px;}
+  h1.htitle{font-size:2.6rem;}
+  .hero-sub{font-size:.95rem;}
+  .hero-actions{flex-direction:column;align-items:center;gap:12px;}
+  .hero-actions a{width:100%;max-width:300px;text-align:center;padding:14px 20px;}
+  .hero-stats{gap:18px;font-size:.7rem;padding-top:20px;}
+
+  /* STATS BAR */
+  .stats-bar{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:14px 8px;padding:20px 5vw;text-align:center;
+  }
+  .stat-item .sval{font-size:.9rem;}
+  .stat-item .slabel{font-size:.62rem;}
+
+  /* CHART */
+  .chart-wrap iframe{height:300px;}
+  .chart-label{font-size:.68rem;padding:10px 14px;}
+
+  /* SECTIONS */
+  .section{padding:70px 5vw;}
+  .section-head{margin-bottom:36px;}
+  .section-head h2{font-size:1.6rem;}
+
+  /* ABOUT GRID */
+  .about-grid{grid-template-columns:1fr;gap:14px;}
+  .about-card{padding:22px 18px;}
+
+  /* TOOLS GRID */
+  .tools-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .tool-pill{padding:12px 13px;}
+  .tool-pill span{font-size:.78rem;}
+  .ticon{width:30px;height:30px;font-size:.85rem;}
+
+  /* TIERS */
+  .tiers-grid{grid-template-columns:1fr 1fr;gap:14px;}
+  .tier-card{padding:20px 16px;}
+  .tier-amount{font-size:1.3rem;}
+
+  /* DEMO / LIVE AI TOOLS */
+  .demo-grid{grid-template-columns:1fr;gap:16px;}
+  .demo-card{padding:18px;}
+  .demo-out{min-height:120px;}
+  .drow{font-size:.72rem;}
+
+  /* CONTRACT */
+  .contract-box{padding:22px 16px;}
+  .crow{flex-direction:column;align-items:flex-start;gap:6px;padding:12px 0;}
+  .cval{font-size:.78rem;word-break:break-all;}
+  .copy-btn{margin-top:4px;}
+
+  /* ROADMAP */
+  .roadmap::before{left:14px;}
+  .road-item{padding-left:44px;margin-bottom:30px;}
+  .rdot{left:5px;width:18px;height:18px;}
+  .road-item h3{font-size:.95rem;}
+  .road-item p{font-size:.85rem;}
+
+  /* CTA */
+  .cta-section{padding:70px 5vw;}
+  .cta-section h2{font-size:1.6rem;}
+  .cta-section>div{flex-direction:column;align-items:center;}
+  .cta-section>div a{width:100%;max-width:300px;text-align:center;}
+
+  /* FOOTER */
+  footer{flex-direction:column;align-items:flex-start;gap:14px;padding:28px 5vw;}
+  .foot-links{flex-wrap:wrap;gap:14px;}
+
+  /* AI WIDGET */
+  .ai-panel{width:calc(100vw - 28px);right:14px;bottom:88px;}
+  .ai-toggle{right:16px;bottom:16px;width:54px;height:54px;}
+}
+
+@media(max-width:480px){
+  /* HERO */
+  h1.htitle{font-size:2.1rem;}
+  .hero-coin{width:140px;height:140px;}
+  .hero-stats{flex-direction:column;align-items:center;gap:10px;border-top:none;}
+
+  /* STATS BAR */
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+
+  /* TOOLS - single column */
+  .tools-grid{grid-template-columns:1fr;}
+  .tool-pill{padding:11px 13px;}
+
+  /* TIERS - single column */
+  .tiers-grid{grid-template-columns:1fr;}
+
+  /* CHART */
+  .chart-wrap iframe{height:260px;}
+
+  /* SECTION HEAD */
+  .section-head h2{font-size:1.4rem;}
+  .section{padding:55px 5vw;}
+}
+
+
 /* LIVE CHART EMBED */
 .chart-wrap{
   max-width:1080px; margin:0 auto; border-radius:20px; overflow:hidden;
@@ -349,7 +477,7 @@ footer{
 .chart-label b{ color:var(--teal); }
 .chart-label .clive{ color:#4ade80; }
 .chart-label .clive::before{ content:'● '; }
-@media(max-width:600px){ .chart-wrap iframe{ height:340px; } }
+
 
 </style>
 </head>
@@ -373,8 +501,23 @@ footer{
     <a href="#contract">Contract</a>
     <a href="#roadmap">Roadmap</a>
   </div>
-  <a class="nav-cta" href="https://jup.ag/tokens/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Trade on Jupiter</a>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a class="nav-cta" href="https://jup.ag/tokens/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Trade on Jupiter</a>
+    <button class="ham-btn" id="hamBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mobMenu">
+  <a href="#chart" onclick="closeMob()">Live Chart</a>
+  <a href="#about" onclick="closeMob()">About</a>
+  <a href="#tools" onclick="closeMob()">Tools</a>
+  <a href="#live-tools" onclick="closeMob()">Live AI</a>
+  <a href="#access" onclick="closeMob()">Access Tiers</a>
+  <a href="#contract" onclick="closeMob()">Contract</a>
+  <a href="#roadmap" onclick="closeMob()">Roadmap</a>
+  <a class="mob-cta" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">View Chart on Birdeye ↗</a>
+</div>
 
 <!-- HERO -->
 <header class="hero">
@@ -939,6 +1082,16 @@ function copyMint(){
   const b = document.querySelector('.copy-btn'); const old = b.innerText;
   b.innerText='Copied!'; setTimeout(()=>{b.innerText=old;}, 1400);
 }
+
+// Hamburger menu
+const hamBtn = document.getElementById('hamBtn');
+const mobMenu = document.getElementById('mobMenu');
+function closeMob(){ mobMenu.classList.remove('open'); }
+if(hamBtn){ hamBtn.addEventListener('click', ()=> mobMenu.classList.toggle('open')); }
+document.addEventListener('click', e=>{
+  if(mobMenu && hamBtn && !mobMenu.contains(e.target) && !hamBtn.contains(e.target)) closeMob();
+});
+
 </script>
 </body>
 </html>
