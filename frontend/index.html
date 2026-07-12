@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAAM AI — Decentralized Future on Solana</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="glow-a"></div>
+<div class="glow-b"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <img src="assets/logo.jpg" alt="LAAM AI">
+    <span>LAAM AI</span>
+  </div>
+  <div class="nav-links">
+    <a href="#chart">Live Chart</a>
+    <a href="#about">About</a>
+    <a href="#tools">Tools</a>
+    <a href="#live-tools">Live AI</a>
+    <a href="#access">Access</a>
+    <a href="#contract">Contract</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="create-token.html">Create Token</a>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a class="nav-cta" href="create-token.html">Launch Token</a>
+    <button class="ham-btn" id="hamBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mobMenu">
+  <a href="#chart" onclick="closeMob()">Live Chart</a>
+  <a href="#about" onclick="closeMob()">About</a>
+  <a href="#tools" onclick="closeMob()">Tools</a>
+  <a href="#live-tools" onclick="closeMob()">Live AI</a>
+  <a href="#access" onclick="closeMob()">Access Tiers</a>
+  <a href="#contract" onclick="closeMob()">Contract</a>
+  <a href="#roadmap" onclick="closeMob()">Roadmap</a>
+  <a href="create-token.html">Create Token</a>
+  <a href="liquidity.html">Add Liquidity</a>
+  <a href="revoke.html">Revoke Authority</a>
+  <a href="dashboard.html">Dashboard</a>
+  <a class="mob-cta" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Open Birdeye ↗</a>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-chain">Built on Solana · Listed on Birdeye</div>
+  <div class="hero-coin">
+    <div class="ring"></div>
+    <div class="ring2"></div>
+    <img src="assets/logo.jpg" alt="LAAM AI">
+  </div>
+  <h1 class="htitle">LAAM AI</h1>
+  <p class="hero-sub">
+    AI-powered crypto intelligence, decentralized and community-owned — built on Solana for speed, low fees, and a transparent future.
+  </p>
+  <div class="hero-actions">
+    <a class="btn-p" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Buy on Birdeye</a>
+    <a class="btn-g" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">View Chart ↗</a>
+    <a class="btn-g" href="create-token.html">Create Your Own Token</a>
+  </div>
+  <div class="hero-stats">
+    <span>NETWORK <b>Solana</b></span>
+    <span>DEX <b>Birdeye</b></span>
+    <span>PRICE <b id="hPrice">Loading…</b></span>
+    <span>LIQUIDITY <b id="hLiq">Loading…</b></span>
+    <span>HOLDERS <b id="hHolders">Loading…</b></span>
+  </div>
+</header>
+
+<!-- LIVE STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="slabel">USD Price</div><div class="sval" id="sPrice"><span class="loading">fetching…</span></div></div>
+  <div class="stat-item"><div class="slabel">Market Cap</div><div class="sval" id="sMcap"><span class="loading">fetching…</span></div></div>
+  <div class="stat-item"><div class="slabel">Liquidity</div><div class="sval" id="sLiq"><span class="loading">fetching…</span></div></div>
+  <div class="stat-item"><div class="slabel">24h Volume</div><div class="sval" id="sVol"><span class="loading">fetching…</span></div></div>
+  <div class="stat-item"><div class="slabel">24h Change</div><div class="sval" id="sChange"><span class="loading">fetching…</span></div></div>
+  <div class="stat-item"><div class="slabel">Holders</div><div class="sval" id="sHolders"><span class="loading">fetching…</span></div></div>
+</div>
+
+
+<!-- LIVE PRICE CHART -->
+<section class="section" id="chart" style="padding-top:60px;padding-bottom:60px;">
+  <div class="section-head">
+    <span class="stag">Live Price Chart</span>
+    <h2>LAAM AI · Real-Time</h2>
+    <p>Live candlestick chart powered by Birdeye — price, volume, and trades updated in real time.</p>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-label">
+      <span class="clive">live</span>
+      <b>LAAM AI / SOL</b>
+      <span>· Solana Mainnet · Birdeye Chart</span>
+    </div>
+    <iframe
+      src="https://birdeye.so/tv-widget/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT?chain=solana&viewMode=pair&chartInterval=15&chartType=CANDLE&chartTimezone=UTC&theme=dark"
+      allowfullscreen
+      loading="lazy"
+      title="LAAM AI Live Chart">
+    </iframe>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="section-head">
+    <span class="stag">About LAAM AI</span>
+    <h2>AI meets decentralization on Solana</h2>
+    <p>LAAM AI is a Solana-native project merging artificial intelligence with on-chain transparency — giving holders access to real crypto intelligence tools, governed by the community.</p>
+  </div>
+  <div class="about-grid">
+    <div class="about-card"><div class="aicon">⚡</div><h3>Solana Speed</h3><p>Sub-second finality and minimal transaction fees — LAAM AI runs on the fastest Layer 1 blockchain, making AI tools affordable for everyone.</p></div>
+    <div class="about-card"><div class="aicon">◈</div><h3>AI Intelligence</h3><p>Real on-chain analytics, whale tracking, market signals, and scam detection — all powered by AI and connected directly to the LAAM token.</p></div>
+    <div class="about-card"><div class="aicon">◆</div><h3>Community Owned</h3><p>The more LAAM you hold, the more tools you unlock. Governance, upgrades, and the future of the project belong to holders.</p></div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section class="section" id="tools">
+  <div class="section-head">
+    <span class="stag">AI Tools Suite</span>
+    <h2>What LAAM AI powers</h2>
+    <p>A growing suite of intelligent crypto tools built to give holders an edge across markets, wallets, and chains.</p>
+  </div>
+  <div class="tools-grid">
+    <div class="tool-pill"><div class="ticon">🤖</div><span>AI Crypto Assistant</span></div>
+    <div class="tool-pill"><div class="ticon">📊</div><span>Market Analysis</span></div>
+    <div class="tool-pill"><div class="ticon">👛</div><span>Wallet Tracking</span></div>
+    <div class="tool-pill"><div class="ticon">🐋</div><span>Whale Alerts</span></div>
+    <div class="tool-pill"><div class="ticon">🛡️</div><span>Scam Detection</span></div>
+    <div class="tool-pill"><div class="ticon">📈</div><span>Trading Signals</span></div>
+    <div class="tool-pill"><div class="ticon">💼</div><span>Portfolio Management</span></div>
+    <div class="tool-pill"><div class="ticon">📰</div><span>News Summarization</span></div>
+    <div class="tool-pill"><div class="ticon">🔗</div><span>Multi-Chain Support</span></div>
+    <div class="tool-pill"><div class="ticon">💬</div><span>AI Chatbot</span></div>
+    <div class="tool-pill"><div class="ticon">🪙</div><span>Token Analytics</span></div>
+    <div class="tool-pill"><div class="ticon">⚠️</div><span>Risk Assessment</span></div>
+    <div class="tool-pill"><div class="ticon">🔔</div><span>Price Alerts</span></div>
+    <div class="tool-pill"><div class="ticon">⛓️</div><span>On-Chain Analytics</span></div>
+    <div class="tool-pill"><div class="ticon">🏦</div><span>DeFi Insights</span></div>
+    <div class="tool-pill"><div class="ticon">🖼️</div><span>NFT Analytics</span></div>
+    <div class="tool-pill"><div class="ticon">🥩</div><span>Staking Dashboard</span></div>
+    <div class="tool-pill"><div class="ticon">⚙️</div><span>AI Automation</span></div>
+    <div class="tool-pill"><div class="ticon">🔌</div><span>API Access</span></div>
+  </div>
+</section>
+
+<!-- TOKEN LAUNCHER PROMO -->
+<section class="section" id="launcher">
+  <div class="section-head">
+    <span class="stag">Token Launcher</span>
+    <h2>Launch your own SPL token on Solana</h2>
+    <p>Create, manage, and grow your own Solana token — no code required. Powered by the LAAM AI backend.</p>
+  </div>
+  <div class="tools-grid">
+    <a class="tool-pill" href="create-token.html"><div class="ticon">🪙</div><span>Create Token</span></a>
+    <a class="tool-pill" href="liquidity.html"><div class="ticon">💧</div><span>Add Liquidity</span></a>
+    <a class="tool-pill" href="revoke.html"><div class="ticon">🔒</div><span>Revoke Authority</span></a>
+    <a class="tool-pill" href="dashboard.html"><div class="ticon">📋</div><span>My Tokens Dashboard</span></a>
+  </div>
+</section>
+
+<!-- LIVE AI DEMO TOOLS -->
+<section class="section" id="live-tools">
+  <div class="section-head">
+    <span class="stag">Live AI Tools</span>
+    <h2>Try the AI — real data, right here</h2>
+    <p>Real Solana wallet analysis and live LAAM AI market data powered by Birdeye and Solana public RPC.</p>
+  </div>
+  <div class="demo-grid">
+    <!-- WALLET TRACKER -->
+    <div class="demo-card">
+      <div class="demo-head">
+        <div class="demo-icon">👛</div>
+        <div>
+          <h3>Wallet Tracker AI</h3>
+          <span class="live">live · Solana mainnet</span>
+        </div>
+      </div>
+      <div class="demo-irow">
+        <input type="text" id="walletIn" placeholder="Paste a Solana wallet address…">
+        <button class="demo-btn" id="walletBtn">Track</button>
+      </div>
+      <div class="demo-out" id="walletOut">
+        <div class="placeholder-msg">Enter a wallet address to see live on-chain analysis</div>
+      </div>
+    </div>
+
+    <!-- MARKET ANALYSIS -->
+    <div class="demo-card">
+      <div class="demo-head">
+        <div class="demo-icon">📊</div>
+        <div>
+          <h3>Market Analysis AI</h3>
+          <span class="live">live · Birdeye + DexScreener</span>
+        </div>
+      </div>
+      <div class="demo-irow">
+        <input type="text" id="marketIn" placeholder="Click Analyze for live LAAM data" readonly>
+        <button class="demo-btn" id="marketBtn">Analyze</button>
+      </div>
+      <div class="demo-out" id="marketOut">
+        <div class="placeholder-msg">Click Analyze to pull live LAAM AI market data</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESS TIERS -->
+<section class="section" id="access">
+  <div class="section-head">
+    <span class="stag">Access Tiers</span>
+    <h2>Hold LAAM, unlock the suite</h2>
+    <p>No subscriptions. No passwords. Your wallet balance is your access key.</p>
+  </div>
+  <div class="tiers-grid">
+    <div class="tier-card">
+      <span class="tier-badge">Tier 01</span>
+      <div class="tier-amount">5 <span>LAAM AI</span></div>
+      <div class="tier-name">AI Chat Assistant</div>
+      <div class="tier-desc">Unlock the core AI crypto assistant for everyday questions and on-chain guidance.</div>
+    </div>
+    <div class="tier-card">
+      <span class="tier-badge">Tier 02</span>
+      <div class="tier-amount">10 <span>LAAM AI</span></div>
+      <div class="tier-name">Market Analysis + News</div>
+      <div class="tier-desc">Add real-time market analysis and AI-summarized crypto news to your dashboard.</div>
+    </div>
+    <div class="tier-card feat">
+      <span class="tier-badge">Tier 03</span>
+      <div class="tier-amount">25 <span>LAAM AI</span></div>
+      <div class="tier-name">Wallet Tracker + Whale Alerts</div>
+      <div class="tier-desc">Track wallets in real time and get notified the moment whales move on Solana.</div>
+    </div>
+    <div class="tier-card">
+      <span class="tier-badge">Tier 04</span>
+      <div class="tier-amount">50+ <span>LAAM AI</span></div>
+      <div class="tier-name">Trading Signals + API</div>
+      <div class="tier-desc">Full Premium — every tool, every signal, plus direct API access for builders.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTRACT -->
+<section class="section" id="contract">
+  <div class="section-head">
+    <span class="stag">Contract Info</span>
+    <h2>Official, verifiable information</h2>
+    <p>Always verify the mint address before swapping. Every detail is publicly verifiable on-chain.</p>
+  </div>
+  <div class="contract-box">
+    <div class="crow"><span class="clabel">NETWORK</span><span class="cval">Solana Mainnet</span></div>
+    <div class="crow"><span class="clabel">TOKEN NAME</span><span class="cval">LAAM AI</span></div>
+    <div class="crow">
+      <span class="clabel">MINT ADDRESS</span>
+      <span class="cval" id="mintAddr">8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT</span>
+      <button class="copy-btn" onclick="copyMint()">Copy</button>
+    </div>
+    <div class="crow"><span class="clabel">DEX</span><span class="cval">Solana Mainnet</span></div>
+    <div class="crow"><span class="clabel">TRADE / CHART</span><span class="cval"><a href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank" style="color:var(--teal)">Birdeye ↗</a> &nbsp;|&nbsp; <a href="https://solscan.io/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank" style="color:var(--teal)">Solscan ↗</a></span></div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="section" id="roadmap">
+  <div class="section-head">
+    <span class="stag">Roadmap</span>
+    <h2>Where we are headed</h2>
+  </div>
+  <div class="roadmap">
+    <div class="road-item done">
+      <div class="rdot"></div>
+      <span class="rphase">PHASE 01 ✓</span>
+      <h3>Token Launch on Solana</h3>
+      <p>LAAM AI was deployed on Solana mainnet and listed on Birdeye — the largest DEX aggregator on Solana.</p>
+    </div>
+    <div class="road-item">
+      <div class="rdot"></div>
+      <span class="rphase">PHASE 02</span>
+      <h3>Community Growth</h3>
+      <p>Growing the holder base, launching community channels, early rewards, and connecting with early believers.</p>
+    </div>
+    <div class="road-item">
+      <div class="rdot"></div>
+      <span class="rphase">PHASE 03</span>
+      <h3>AI Tools Launch</h3>
+      <p>Releasing the full AI suite — wallet tracker, market analysis, whale alerts, and trading signals — all gated by LAAM holdings.</p>
+    </div>
+    <div class="road-item">
+      <div class="rdot"></div>
+      <span class="rphase">PHASE 04</span>
+      <h3>Exchange Listings + API</h3>
+      <p>Pursuing CEX listings and opening the LAAM AI API for developers building on top of our intelligence layer.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Join the Decentralized AI Future</h2>
+  <p>LAAM AI is more than a token — it's a gateway to AI tools that are open, on-chain, and community-owned.</p>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;">
+    <a class="btn-p" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Buy on Birdeye</a>
+    <a class="btn-g" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Live Chart on Birdeye ↗</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-brand">
+    <img src="assets/logo.jpg" alt="LAAM AI">
+    LAAM AI · Decentralized Future
+  </div>
+  <div class="foot-links">
+    <a href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Birdeye</a>
+    <a href="https://solscan.io/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Solscan</a>
+    <a href="#chart">Live Chart</a>
+    <a href="#about">About</a>
+    <a href="#contract">Contract</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="create-token.html">Create Token</a>
+  </div>
+  <span>© 2026 LAAM AI</span>
+</footer>
+
+<!-- AI CHAT WIDGET -->
+<button class="ai-toggle" id="aiToggle"><span class="adot"></span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="#040a0f" stroke-width="2" width="24" height="24"><path d="M12 2L4 7v10l8 5 8-5V7l-8-5z"/><circle cx="12" cy="12" r="3" fill="#040a0f"/></svg>
+</button>
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-head">
+    <img src="assets/logo.jpg" alt="LAAM AI">
+    <div class="ameta"><b>LAAM Assistant</b><span>online · Solana guide</span></div>
+  </div>
+  <div class="ai-body" id="aiBody">
+    <div class="amsg bot">Hey, I'm the LAAM AI guide. Ask me about the mint address, tokenomics, how to buy on Birdeye, or what tools are unlocked at each tier.</div>
+  </div>
+  <div class="ai-chips">
+    <button class="chip" data-q="mint">Mint address</button>
+    <button class="chip" data-q="buy">How to buy</button>
+    <button class="chip" data-q="tiers">Access tiers</button>
+    <button class="chip" data-q="tools">What tools?</button>
+  </div>
+  <div class="ai-irow">
+    <input type="text" id="aiIn" placeholder="Ask the assistant…">
+    <button class="ai-send" id="aiSend"><svg viewBox="0 0 24 24" fill="none" stroke="#040a0f" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

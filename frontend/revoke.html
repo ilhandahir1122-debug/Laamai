@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revoke Authority — LAAM AI</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="glow-a"></div>
+<div class="glow-b"></div>
+
+<nav>
+  <a href="index.html" class="nav-brand">
+    <img src="assets/logo.jpg" alt="LAAM AI">
+    <span>LAAM AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="create-token.html">Create Token</a>
+    <a href="liquidity.html">Liquidity</a>
+    <a href="revoke.html">Revoke</a>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a class="nav-cta" href="index.html">← Back to Site</a>
+  </div>
+</nav>
+
+<main class="app-main">
+  <div class="app-head">
+    <span class="stag">Trust &amp; Safety</span>
+    <h1>Revoke Mint / Freeze Authority</h1>
+    <p>Permanently give up the ability to mint new supply or freeze holder accounts for a token you control. This is irreversible and commonly used to prove a fixed, safe supply to your community.</p>
+  </div>
+
+  <div class="app-nav-links">
+    <a href="create-token.html">Create Token</a>
+    <a href="liquidity.html">Add Liquidity</a>
+    <a href="revoke.html" class="active">Revoke Authority</a>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+
+  <div class="wallet-bar">
+    <div class="wallet-status">
+      <span class="wallet-dot" data-wallet-dot></span>
+      <span data-wallet-addr>Not connected</span>
+    </div>
+    <button class="btn-wallet" data-wallet-connect>Connect Wallet</button>
+  </div>
+
+  <form class="form-card" id="revokeForm">
+    <div class="form-group">
+      <label for="revokeMintAddr">Token Mint Address</label>
+      <input type="text" id="revokeMintAddr" placeholder="Paste the SPL token mint address" required>
+      <span class="hint">Your connected wallet must currently hold the mint and/or freeze authority.</span>
+    </div>
+
+    <div class="form-group">
+      <label><input type="checkbox" id="revokeMintAuth" checked style="width:auto;margin-right:8px;">Revoke Mint Authority (no more tokens can ever be minted)</label>
+      <label><input type="checkbox" id="revokeFreezeAuth" style="width:auto;margin-right:8px;">Revoke Freeze Authority (accounts can never be frozen)</label>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-submit" id="revokeSubmitBtn">Revoke Authority</button>
+    </div>
+  </form>
+
+  <div class="status-box" id="revokeStatus"></div>
+  <div class="result-card" id="revokeResult" style="display:none;"></div>
+</main>
+
+<script src="https://unpkg.com/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+<script src="js/wallet.js"></script>
+<script src="js/token.js"></script>
+</body>
+</html>

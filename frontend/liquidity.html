@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Liquidity — LAAM AI</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="glow-a"></div>
+<div class="glow-b"></div>
+
+<nav>
+  <a href="index.html" class="nav-brand">
+    <img src="assets/logo.jpg" alt="LAAM AI">
+    <span>LAAM AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="create-token.html">Create Token</a>
+    <a href="liquidity.html">Liquidity</a>
+    <a href="revoke.html">Revoke</a>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a class="nav-cta" href="index.html">← Back to Site</a>
+  </div>
+</nav>
+
+<main class="app-main">
+  <div class="app-head">
+    <span class="stag">Liquidity</span>
+    <h1>Add Liquidity <span class="badge-soon">Coming Soon</span></h1>
+    <p>Create a Raydium liquidity pool for your token so it becomes tradable. This page is wired up end-to-end (wallet, form, API call) but the backend transaction builder is a stub until the Raydium SDK integration is finished — see <code>backend/services</code> for the TODO.</p>
+  </div>
+
+  <div class="app-nav-links">
+    <a href="create-token.html">Create Token</a>
+    <a href="liquidity.html" class="active">Add Liquidity</a>
+    <a href="revoke.html">Revoke Authority</a>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+
+  <div class="wallet-bar">
+    <div class="wallet-status">
+      <span class="wallet-dot" data-wallet-dot></span>
+      <span data-wallet-addr>Not connected</span>
+    </div>
+    <button class="btn-wallet" data-wallet-connect>Connect Wallet</button>
+  </div>
+
+  <form class="form-card" id="liquidityForm">
+    <div class="form-group">
+      <label for="liqMintAddr">Token Mint Address</label>
+      <input type="text" id="liqMintAddr" placeholder="Your token's mint address" required>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="liqSolAmount">SOL to Deposit</label>
+        <input type="number" id="liqSolAmount" placeholder="e.g. 5" min="0" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label for="liqTokenAmount">Token Amount to Deposit</label>
+        <input type="number" id="liqTokenAmount" placeholder="e.g. 500000" min="0" required>
+      </div>
+    </div>
+    <div class="hint" id="feeNote" style="text-align:center;"></div>
+    <div class="form-actions">
+      <button type="submit" class="btn-submit" id="liquiditySubmitBtn">Create Pool</button>
+    </div>
+  </form>
+
+  <div class="status-box" id="liquidityStatus"></div>
+</main>
+
+<script src="https://unpkg.com/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+<script src="js/wallet.js"></script>
+<script src="js/liquidity.js"></script>
+</body>
+</html>

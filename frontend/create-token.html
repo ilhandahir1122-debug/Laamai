@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Token — LAAM AI</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="glow-a"></div>
+<div class="glow-b"></div>
+
+<nav>
+  <a href="index.html" class="nav-brand">
+    <img src="assets/logo.jpg" alt="LAAM AI">
+    <span>LAAM AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="create-token.html">Create Token</a>
+    <a href="liquidity.html">Liquidity</a>
+    <a href="revoke.html">Revoke</a>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a class="nav-cta" href="index.html">← Back to Site</a>
+  </div>
+</nav>
+
+<main class="app-main">
+  <div class="app-head">
+    <span class="stag">Solana Token Launcher</span>
+    <h1>Create your SPL Token</h1>
+    <p>Deploys a real SPL token mint on Solana mainnet-beta with on-chain metadata. You pay the network fee from your own wallet — the backend never holds your funds or your keys.</p>
+  </div>
+
+  <div class="app-nav-links">
+    <a href="create-token.html" class="active">Create Token</a>
+    <a href="liquidity.html">Add Liquidity</a>
+    <a href="revoke.html">Revoke Authority</a>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+
+  <div class="wallet-bar">
+    <div class="wallet-status">
+      <span class="wallet-dot" data-wallet-dot></span>
+      <span data-wallet-addr>Not connected</span>
+    </div>
+    <button class="btn-wallet" data-wallet-connect>Connect Wallet</button>
+  </div>
+
+  <form class="form-card" id="createTokenForm">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="tokenName">Token Name</label>
+        <input type="text" id="tokenName" placeholder="e.g. Laam Coin" maxlength="32" required>
+      </div>
+      <div class="form-group">
+        <label for="tokenSymbol">Symbol</label>
+        <input type="text" id="tokenSymbol" placeholder="e.g. LAAM" maxlength="10" required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="tokenDecimals">Decimals</label>
+        <input type="number" id="tokenDecimals" value="9" min="0" max="9" required>
+        <span class="hint">9 is standard for most SPL tokens.</span>
+      </div>
+      <div class="form-group">
+        <label for="tokenSupply">Total Supply</label>
+        <input type="number" id="tokenSupply" placeholder="e.g. 1000000000" min="1" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="tokenDescription">Description</label>
+      <textarea id="tokenDescription" placeholder="What is this token for?"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="tokenImage">Logo Image</label>
+      <input type="file" id="tokenImage" accept="image/png,image/jpeg,image/webp">
+      <img id="imagePreview" class="image-preview" alt="preview">
+      <span class="hint">Uploaded to IPFS by the backend. Requires Pinata to be configured server-side.</span>
+    </div>
+
+    <div class="form-group">
+      <label for="tokenMetadataUri">Metadata URI (optional — overrides image upload)</label>
+      <input type="text" id="tokenMetadataUri" placeholder="https://... or ipfs://... (leave blank to auto-upload the logo above)">
+    </div>
+
+    <div class="hint" id="feeNote" style="text-align:center;"></div>
+    <div class="form-actions">
+      <button type="submit" class="btn-submit" id="createSubmitBtn">Create Token</button>
+    </div>
+  </form>
+
+  <div class="status-box" id="createStatus"></div>
+  <div class="result-card" id="createResult" style="display:none;"></div>
+</main>
+
+<script src="https://unpkg.com/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+<script src="js/wallet.js"></script>
+<script src="js/token.js"></script>
+</body>
+</html>
