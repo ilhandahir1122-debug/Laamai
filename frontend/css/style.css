@@ -18,7 +18,7 @@ body{background:var(--bg);color:var(--white);font-family:'Manrope',sans-serif;ov
 
 /* BG GRID */
 .bg-grid{
-  position:fixed;inset:0;z-index:0;opacity:0.28;
+  position:fixed;inset:0;z-index:0;opacity:0.28;pointer-events:none;
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
   background-size:38px 38px;
   mask-image:radial-gradient(circle at 50% 30%,rgba(0,0,0,.9) 0%,transparent 72%);
@@ -473,7 +473,7 @@ footer{
 
 
 /* ========== APP PAGES (create-token / liquidity / revoke / dashboard) ========== */
-.app-main{padding:130px 5vw 100px;min-height:100vh;}
+.app-main{padding:130px 5vw 100px;min-height:100vh;position:relative;z-index:1;}
 .app-head{max-width:640px;margin:0 auto 40px;text-align:center;}
 .app-head h1{font-family:'Orbitron',sans-serif;font-size:clamp(1.7rem,3.4vw,2.4rem);margin-bottom:12px;
   background:linear-gradient(90deg,var(--teal),#fff);-webkit-background-clip:text;background-clip:text;color:transparent;}
