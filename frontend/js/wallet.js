@@ -255,7 +255,14 @@ function initWalletBar() {
 
   async function pickAndConnect(adapterId) {
     console.log('[LaamWallet] connecting with', adapterId);
-    if (btn) btn.disabled = true;
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Check your wallet…';
+    }
+    if (statusText) statusText.textContent = 'Waiting for approval — check your wallet extension icon';
+    const nudgeTimer = setTimeout(() => {
+      if (statusText) statusText.textContent = 'Still waiting — click your wallet\'s icon in the browser toolbar to approve';
+    }, 4000);
     try {
       await LaamWallet.connectWith(adapterId);
     } catch (e) {
@@ -263,6 +270,7 @@ function initWalletBar() {
       if (statusText) statusText.textContent = e.message;
       alert(e.message);
     } finally {
+      clearTimeout(nudgeTimer);
       if (btn) btn.disabled = false;
       render();
       document.dispatchEvent(new CustomEvent('laam-wallet-changed'));
