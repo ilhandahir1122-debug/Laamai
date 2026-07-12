@@ -7,7 +7,7 @@
    backend builds. This app never asks for, stores, or transmits a private key. */
 
 /* Point this at your deployed Render backend, e.g. "https://laam-ai-backend.onrender.com" */
-const LAAM_BACKEND_URL = window.LAAM_BACKEND_URL || 'http://localhost:4000';
+const LAAM_BACKEND_URL = window.LAAM_BACKEND_URL || 'https://laamai-1.onrender.com';
 
 /* Public mainnet-beta RPC is rate-limited — swap in a Helius/QuickNode/Alchemy URL for production. */
 const LAAM_SOLANA_RPC = window.LAAM_SOLANA_RPC || 'https://api.mainnet-beta.solana.com';
