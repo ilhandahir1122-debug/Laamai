@@ -536,25 +536,6 @@ footer{
     <a class="btn-g" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">View Chart ↗</a>
     <a class="btn-g" href="#about">Explore Project</a>
   </div>
-  <div class="hero-stats">
-    <span>NETWORK <b>Solana</b></span>
-    <span>DEX <b>Birdeye</b></span>
-    <span>PRICE <b id="hPrice">Loading…</b></span>
-    <span>LIQUIDITY <b id="hLiq">Loading…</b></span>
-    <span>HOLDERS <b id="hHolders">Loading…</b></span>
-  </div>
-</header>
-
-<!-- LIVE STATS BAR -->
-<div class="stats-bar">
-  <div class="stat-item"><div class="slabel">USD Price</div><div class="sval" id="sPrice"><span class="loading">fetching…</span></div></div>
-  <div class="stat-item"><div class="slabel">Market Cap</div><div class="sval" id="sMcap"><span class="loading">fetching…</span></div></div>
-  <div class="stat-item"><div class="slabel">Liquidity</div><div class="sval" id="sLiq"><span class="loading">fetching…</span></div></div>
-  <div class="stat-item"><div class="slabel">24h Volume</div><div class="sval" id="sVol"><span class="loading">fetching…</span></div></div>
-  <div class="stat-item"><div class="slabel">24h Change</div><div class="sval" id="sChange"><span class="loading">fetching…</span></div></div>
-  <div class="stat-item"><div class="slabel">Holders</div><div class="sval" id="sHolders"><span class="loading">fetching…</span></div></div>
-</div>
-
 
 <!-- LIVE PRICE CHART -->
 <section class="section" id="chart" style="padding-top:60px;padding-bottom:60px;">
@@ -885,78 +866,116 @@ async function loadStats(){
 }
 loadStats();
 
-/* ===== WALLET TRACKER (Solana public RPC) ===== */
+/* ===== WALLET TRACKER — REAL DATA (multi-RPC + Solscan fallback) ===== */
 const walletBtn = document.getElementById('walletBtn');
 const walletIn  = document.getElementById('walletIn');
 const walletOut = document.getElementById('walletOut');
 
-async function rpc(method, params){
-  const res = await fetch(SOL_RPC, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({jsonrpc:'2.0',id:1,method,params})
+// Multiple public RPC endpoints — tries each until one works
+const RPC_ENDPOINTS = [
+  "https://api.mainnet-beta.solana.com",
+  "https://rpc.ankr.com/solana",
+  "https://solana-mainnet.g.alchemy.com/v2/demo",
+  "https://go.getblock.io/solana-mainnet",
+];
+
+async function rpcCall(endpoint, method, params){
+  const res = await fetch(endpoint, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({jsonrpc:'2.0', id:1, method, params})
   });
   const d = await res.json();
   if(d.error) throw new Error(d.error.message);
+  if(d.result === undefined) throw new Error('No result');
   return d.result;
+}
+
+// Try each RPC until success
+async function rpc(method, params){
+  let lastErr;
+  for(const ep of RPC_ENDPOINTS){
+    try{ return await rpcCall(ep, method, params); }
+    catch(e){ lastErr = e; }
+  }
+  throw lastErr;
+}
+
+// Solscan public API fallback for tx count + account info
+async function solscanAccount(addr){
+  const r = await fetch(`https://public-api.solscan.io/account/${addr}`, {
+    headers:{'accept':'application/json'}
+  });
+  return r.ok ? r.json() : null;
 }
 
 walletBtn.addEventListener('click', async () => {
   const addr = walletIn.value.trim();
   if(!addr){ walletIn.focus(); return; }
+
+  // Basic Solana address validation (base58, 32-44 chars)
+  if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(addr)){
+    walletOut.innerHTML = '<div class="placeholder-msg">⚠️ Invalid Solana address. Paste a full base58 wallet address.</div>';
+    return;
+  }
+
   walletOut.innerHTML = '<div class="scan-line"></div><div class="placeholder-msg">Scanning Solana blockchain…</div>';
 
   try{
-    // SOL balance
+    // 1) SOL balance
     const balResult = await rpc('getBalance', [addr]);
-    const solBalance = (balResult.value / 1e9).toFixed(4);
+    const solBalance = ((balResult.value ?? balResult) / 1e9).toFixed(4);
 
-    // LAAM AI token balance
-    const tokenResult = await rpc('getTokenAccountsByOwner', [
-      addr,
-      { mint: LAAM_MINT },
-      { encoding: 'jsonParsed' }
-    ]);
+    // 2) LAAM AI token balance
     let laamBalance = '0';
-    if(tokenResult.value && tokenResult.value.length){
-      const amount = tokenResult.value[0].account.data.parsed.info.tokenAmount.uiAmount;
-      laamBalance = amount !== null ? parseFloat(amount).toFixed(2) : '0';
-    }
+    try{
+      const tokenResult = await rpc('getTokenAccountsByOwner', [
+        addr,
+        { mint: LAAM_MINT },
+        { encoding: 'jsonParsed' }
+      ]);
+      if(tokenResult.value && tokenResult.value.length){
+        const ui = tokenResult.value[0].account.data.parsed.info.tokenAmount.uiAmount;
+        laamBalance = ui !== null ? parseFloat(ui).toFixed(2) : '0';
+      }
+    }catch(e){ /* token account might not exist = 0 balance */ }
 
-    // Transaction count (signature count)
-    const sigs = await rpc('getSignaturesForAddress', [addr, {limit:1000}]);
-    const txCount = sigs.length >= 1000 ? '1000+' : sigs.length;
+    // 3) Recent transaction count via getSignaturesForAddress
+    let txCount = '0';
+    try{
+      const sigs = await rpc('getSignaturesForAddress', [addr, {limit:50}]);
+      txCount = sigs.length >= 50 ? '50+' : String(sigs.length);
+    }catch(e){}
+
+    // 4) Extra info from Solscan (non-blocking)
+    let solscanData = null;
+    try{ solscanData = await solscanAccount(addr); }catch(e){}
+
+    const totalTx = solscanData?.txCount
+      ? solscanData.txCount.toLocaleString()
+      : txCount;
 
     const laamNum = parseFloat(laamBalance);
-    const tierLabel = laamNum >= 50 ? '<span class="up">⭐ Tier 4 — Full Premium</span>'
-                    : laamNum >= 25 ? '<span class="up">🐋 Tier 3 — Whale Tracker</span>'
-                    : laamNum >= 10 ? '<span style="color:var(--teal)">📊 Tier 2 — Market Analysis</span>'
-                    : laamNum >= 5  ? '<span style="color:var(--teal)">🤖 Tier 1 — AI Chat</span>'
-                    : '<span class="neutral">No tier — buy LAAM to unlock</span>';
+    const tierLabel =
+      laamNum >= 50 ? '<span class="up">⭐ Tier 4 — Full Premium + API</span>'
+    : laamNum >= 25 ? '<span class="up">🐋 Tier 3 — Whale Tracker</span>'
+    : laamNum >= 10 ? '<span style="color:var(--teal)">📊 Tier 2 — Market Analysis</span>'
+    : laamNum >= 5  ? '<span style="color:var(--teal)">🤖 Tier 1 — AI Chat</span>'
+    : '<span class="neutral">No tier — buy LAAM to unlock</span>';
 
-    const isWhale = laamNum >= 50;
-    const shortAddr = addr.length > 10 ? addr.slice(0,5)+'…'+addr.slice(-4) : addr;
+    const shortAddr = addr.slice(0,5)+'…'+addr.slice(-4);
+    const solscanLink = `https://solscan.io/account/${addr}`;
 
     walletOut.innerHTML = `
-      <div class="drow"><span>Address</span><b>${shortAddr}</b></div>
+      <div class="drow"><span>Address</span><b><a href="${solscanLink}" target="_blank" style="color:var(--teal)">${shortAddr} ↗</a></b></div>
       <div class="drow"><span>SOL Balance</span><b>${solBalance} SOL</b></div>
       <div class="drow"><span>LAAM AI Balance</span><b>${laamBalance} LAAM</b></div>
-      <div class="drow"><span>Transactions</span><b>${txCount}</b></div>
+      <div class="drow"><span>Total Transactions</span><b>${totalTx}</b></div>
       <div class="drow"><span>Access Tier</span><b>${tierLabel}</b></div>
-      <div class="drow"><span>Whale Status</span><b>${isWhale ? '<span class="up">⚡ Large holder</span>' : '<span class="neutral">Regular holder</span>'}</b></div>
+      <div class="drow"><span>Whale Status</span><b>${laamNum>=50 ? '<span class="up">⚡ Large holder</span>' : laamNum>0 ? '<span style="color:var(--teal)">Regular holder</span>' : '<span class="neutral">No LAAM held</span>'}</b></div>
     `;
   } catch(err){
-    const isSandbox = err.message.includes('fetch') || err.message.includes('network') || err.message.includes('Failed');
-    if(isSandbox){
-      walletOut.innerHTML = `
-        <div class="drow"><span>Status</span><b><span class="up">✓ Code is correct</span></b></div>
-        <div class="drow"><span>Issue</span><b><span class="neutral">Preview sandbox blocks RPC</span></b></div>
-        <div class="drow"><span>On GitHub Pages</span><b><span class="up">Will work live ✓</span></b></div>
-        <div class="drow"><span>API Used</span><b>Solana mainnet RPC</b></div>
-        <div class="drow"><span>Tracks</span><b>SOL + LAAM balance + Tier</b></div>
-      `;
-    } else {
-      walletOut.innerHTML = `<div class="placeholder-msg">Could not fetch wallet: ${err.message}</div>`;
-    }
+    walletOut.innerHTML = `<div class="placeholder-msg">❌ ${err.message}<br><br>Check address and try again, or view on <a href="https://solscan.io/account/${addr}" target="_blank" style="color:var(--teal)">Solscan ↗</a></div>`;
   }
 });
 walletIn.addEventListener('keydown', e => { if(e.key==='Enter') walletBtn.click(); });
