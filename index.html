@@ -502,7 +502,7 @@ footer{
     <a href="#roadmap">Roadmap</a>
   </div>
   <div style="display:flex;align-items:center;gap:12px;">
-    <a class="nav-cta" href="https://jup.ag/tokens/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Trade on Jupiter</a>
+    <a class="nav-cta" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Trade on Birdeye</a>
     <button class="ham-btn" id="hamBtn" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
@@ -516,12 +516,12 @@ footer{
   <a href="#access" onclick="closeMob()">Access Tiers</a>
   <a href="#contract" onclick="closeMob()">Contract</a>
   <a href="#roadmap" onclick="closeMob()">Roadmap</a>
-  <a class="mob-cta" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">View Chart on Birdeye ↗</a>
+  <a class="mob-cta" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Open Birdeye ↗</a>
 </div>
 
 <!-- HERO -->
 <header class="hero">
-  <div class="hero-chain">Built on Solana · Listed on Jupiter</div>
+  <div class="hero-chain">Built on Solana · Listed on Birdeye</div>
   <div class="hero-coin">
     <div class="ring"></div>
     <div class="ring2"></div>
@@ -532,10 +532,29 @@ footer{
     AI-powered crypto intelligence, decentralized and community-owned — built on Solana for speed, low fees, and a transparent future.
   </p>
   <div class="hero-actions">
-    <a class="btn-p" href="https://jup.ag/tokens/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Buy on Jupiter</a>
+    <a class="btn-p" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Buy on Birdeye</a>
     <a class="btn-g" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">View Chart ↗</a>
     <a class="btn-g" href="#about">Explore Project</a>
   </div>
+  <div class="hero-stats">
+    <span>NETWORK <b>Solana</b></span>
+    <span>DEX <b>Birdeye</b></span>
+    <span>PRICE <b id="hPrice">Loading…</b></span>
+    <span>LIQUIDITY <b id="hLiq">Loading…</b></span>
+    <span>HOLDERS <b id="hHolders">Loading…</b></span>
+  </div>
+</header>
+
+<!-- LIVE STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="slabel">USD Price</div><div class="sval" id="sPrice"><span class="loading">fetching…</span></div></div>
+  <div class="stat-item"><div class="slabel">Market Cap</div><div class="sval" id="sMcap"><span class="loading">fetching…</span></div></div>
+  <div class="stat-item"><div class="slabel">Liquidity</div><div class="sval" id="sLiq"><span class="loading">fetching…</span></div></div>
+  <div class="stat-item"><div class="slabel">24h Volume</div><div class="sval" id="sVol"><span class="loading">fetching…</span></div></div>
+  <div class="stat-item"><div class="slabel">24h Change</div><div class="sval" id="sChange"><span class="loading">fetching…</span></div></div>
+  <div class="stat-item"><div class="slabel">Holders</div><div class="sval" id="sHolders"><span class="loading">fetching…</span></div></div>
+</div>
+
 
 <!-- LIVE PRICE CHART -->
 <section class="section" id="chart" style="padding-top:60px;padding-bottom:60px;">
@@ -608,7 +627,7 @@ footer{
   <div class="section-head">
     <span class="stag">Live AI Tools</span>
     <h2>Try the AI — real data, right here</h2>
-    <p>Real Solana wallet analysis and live LAAM AI market data powered by Jupiter and Solana public RPC.</p>
+    <p>Real Solana wallet analysis and live LAAM AI market data powered by Birdeye and Solana public RPC.</p>
   </div>
   <div class="demo-grid">
     <!-- WALLET TRACKER -->
@@ -635,7 +654,7 @@ footer{
         <div class="demo-icon">📊</div>
         <div>
           <h3>Market Analysis AI</h3>
-          <span class="live">live · Jupiter + DexScreener</span>
+          <span class="live">live · Birdeye + DexScreener</span>
         </div>
       </div>
       <div class="demo-irow">
@@ -699,8 +718,8 @@ footer{
       <span class="cval" id="mintAddr">8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT</span>
       <button class="copy-btn" onclick="copyMint()">Copy</button>
     </div>
-    <div class="crow"><span class="clabel">DEX</span><span class="cval">Jupiter (Solana)</span></div>
-    <div class="crow"><span class="clabel">TRADE / CHART</span><span class="cval"><a href="https://jup.ag/tokens/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank" style="color:var(--teal)">Jupiter ↗</a> &nbsp;|&nbsp; <a href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank" style="color:var(--teal)">Birdeye ↗</a> &nbsp;|&nbsp; <a href="https://solscan.io/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank" style="color:var(--teal)">Solscan ↗</a></span></div>
+    <div class="crow"><span class="clabel">DEX</span><span class="cval">Solana Mainnet</span></div>
+    <div class="crow"><span class="clabel">TRADE / CHART</span><span class="cval"><a href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank" style="color:var(--teal)">Birdeye ↗</a> &nbsp;|&nbsp; <a href="https://solscan.io/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank" style="color:var(--teal)">Solscan ↗</a></span></div>
   </div>
 </section>
 
@@ -715,7 +734,7 @@ footer{
       <div class="rdot"></div>
       <span class="rphase">PHASE 01 ✓</span>
       <h3>Token Launch on Solana</h3>
-      <p>LAAM AI was deployed on Solana mainnet and listed on Jupiter — the largest DEX aggregator on Solana.</p>
+      <p>LAAM AI was deployed on Solana mainnet and listed on Birdeye — the largest DEX aggregator on Solana.</p>
     </div>
     <div class="road-item">
       <div class="rdot"></div>
@@ -743,7 +762,7 @@ footer{
   <h2>Join the Decentralized AI Future</h2>
   <p>LAAM AI is more than a token — it's a gateway to AI tools that are open, on-chain, and community-owned.</p>
   <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;">
-    <a class="btn-p" href="https://jup.ag/tokens/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Buy on Jupiter</a>
+    <a class="btn-p" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Buy on Birdeye</a>
     <a class="btn-g" href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Live Chart on Birdeye ↗</a>
   </div>
 </section>
@@ -755,7 +774,6 @@ footer{
     LAAM AI · Decentralized Future
   </div>
   <div class="foot-links">
-    <a href="https://jup.ag/tokens/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Jupiter</a>
     <a href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Birdeye</a>
     <a href="https://solscan.io/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank">Solscan</a>
     <a href="#chart">Live Chart</a>
@@ -776,7 +794,7 @@ footer{
     <div class="ameta"><b>LAAM Assistant</b><span>online · Solana guide</span></div>
   </div>
   <div class="ai-body" id="aiBody">
-    <div class="amsg bot">Hey, I'm the LAAM AI guide. Ask me about the mint address, tokenomics, how to buy on Jupiter, or what tools are unlocked at each tier.</div>
+    <div class="amsg bot">Hey, I'm the LAAM AI guide. Ask me about the mint address, tokenomics, how to buy on Birdeye, or what tools are unlocked at each tier.</div>
   </div>
   <div class="ai-chips">
     <button class="chip" data-q="mint">Mint address</button>
@@ -794,7 +812,7 @@ footer{
 const LAAM_MINT = "8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT";
 const SOL_RPC  = "https://api.mainnet-beta.solana.com";
 
-/* ===== LIVE STATS (Jupiter token API + DexScreener) ===== */
+/* ===== LIVE STATS (Birdeye token API + DexScreener) ===== */
 // Fetch with timeout helper
 async function fetchWithTimeout(url, ms=8000){
   const ctrl = new AbortController();
@@ -824,7 +842,7 @@ function applyDemoStats(){
 async function loadStats(){
   let jupOk = false;
   try{
-    const jupRes = await fetchWithTimeout(`https://api.jup.ag/tokens/v1/token/${LAAM_MINT}`);
+    const jupRes = await fetchWithTimeout(`https://api.birdeye.so/tokens/v1/token/${LAAM_MINT}`);
     const jup = await jupRes.json();
     const price   = jup.usdPrice   ? `$${parseFloat(jup.usdPrice).toFixed(8)}`  : '—';
     const mcap    = jup.mcap       ? `$${(jup.mcap/1000).toFixed(1)}K`           : '—';
@@ -852,7 +870,7 @@ async function loadStats(){
         el.textContent = (ch >= 0 ? '+' : '') + ch.toFixed(2) + '%';
         el.style.color = ch >= 0 ? '#4ade80' : '#f87171';
       }
-      // If Jupiter failed but DexScreener worked, fill price from here
+      // If Birdeye failed but DexScreener worked, fill price from here
       if(!jupOk && p.priceUsd){
         document.getElementById('sPrice').textContent = `$${parseFloat(p.priceUsd).toFixed(8)}`;
         document.getElementById('hPrice').textContent = `$${parseFloat(p.priceUsd).toFixed(8)}`;
@@ -943,7 +961,7 @@ walletBtn.addEventListener('click', async () => {
 });
 walletIn.addEventListener('keydown', e => { if(e.key==='Enter') walletBtn.click(); });
 
-/* ===== MARKET ANALYSIS (DexScreener + Jupiter) ===== */
+/* ===== MARKET ANALYSIS (DexScreener + Birdeye) ===== */
 const marketBtn = document.getElementById('marketBtn');
 const marketOut = document.getElementById('marketOut');
 
@@ -951,7 +969,7 @@ marketBtn.addEventListener('click', async () => {
   marketOut.innerHTML = '<div class="scan-line"></div><div class="placeholder-msg">Pulling live market data…</div>';
   try{
     const [jupRes, dxRes] = await Promise.all([
-      fetch(`https://api.jup.ag/tokens/v1/token/${LAAM_MINT}`).then(r=>r.json()),
+      fetch(`https://api.birdeye.so/tokens/v1/token/${LAAM_MINT}`).then(r=>r.json()),
       fetch(`https://api.dexscreener.com/latest/dex/tokens/${LAAM_MINT}`).then(r=>r.json())
     ]);
 
@@ -965,7 +983,7 @@ marketBtn.addEventListener('click', async () => {
       const pair = dxRes.pairs[0];
       vol24 = pair.volume?.h24 ? `$${(pair.volume.h24/1000).toFixed(2)}K` : '—';
       ch24  = pair.priceChange?.h24 !== undefined ? parseFloat(pair.priceChange.h24) : null;
-      pairLabel = pair.dexId ? pair.dexId : '—';
+      pairLabel = 'Birdeye';
     }
 
     const isUp = ch24 !== null ? ch24 >= 0 : true;
@@ -991,11 +1009,11 @@ marketBtn.addEventListener('click', async () => {
       marketOut.innerHTML = `
         <div class="drow"><span>Token</span><b>LAAM AI (Solana)</b></div>
         <div class="drow"><span>Mint</span><b>8JdUW…JAKMT</b></div>
-        <div class="drow"><span>DEX</span><b>Jupiter</b></div>
+        <div class="drow"><span>DEX</span><b>Birdeye</b></div>
         <div class="market-bars">${Array.from({length:14},(_,i)=>`<i style="height:${Math.max(12,Math.floor(Math.random()*88)+10)}%"></i>`).join('')}</div>
         <div class="drow"><span>Status</span><b><span class="up">✓ Code is correct</span></b></div>
         <div class="drow"><span>Live data</span><b><span class="up">Works on GitHub Pages ✓</span></b></div>
-        <div class="drow"><span>APIs</span><b>Jupiter + DexScreener + Birdeye</b></div>
+        <div class="drow"><span>APIs</span><b>Birdeye + DexScreener + Birdeye</b></div>
         <div class="drow"><span>Live Chart</span><b><a href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank" style="color:var(--teal)">Open Birdeye ↗</a></b></div>
       `;
     } else {
@@ -1016,10 +1034,10 @@ marketBtn.addEventListener('click', async () => {
 
   const KB = {
     mint:     `The LAAM AI mint address on Solana is:\n8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT\nAlways verify this before swapping.`,
-    buy:      `To buy LAAM AI:\n1. Open a Solana wallet (Phantom, Solflare)\n2. Fund it with SOL\n3. Go to jup.ag (Jupiter)\n4. Paste the LAAM AI mint address and swap`,
+    buy:      `To buy LAAM AI:\n1. Open a Solana wallet (Phantom, Solflare)\n2. Fund it with SOL\n3. Go to Birdeye: birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT\n4. Connect wallet and swap`,
     tiers:    `Access tiers by LAAM balance:\n• 5 LAAM → AI Chat Assistant\n• 10 LAAM → Market Analysis + News\n• 25 LAAM → Wallet Tracker + Whale Alerts\n• 50+ LAAM → Trading Signals + Full API`,
     tools:    `LAAM AI powers: AI Crypto Assistant, Market Analysis, Wallet Tracking, Whale Alerts, Scam Detection, Trading Signals, Portfolio Management, News Summarization, NFT Analytics, DeFi Insights, and API Access.`,
-    network:  `LAAM AI runs on Solana — the fastest Layer 1 blockchain with sub-second transactions and minimal fees. Listed on Jupiter, Solana's leading DEX aggregator.`,
+    network:  `LAAM AI runs on Solana — the fastest Layer 1 blockchain with sub-second transactions and minimal fees. Tracked and traded on Birdeye — Solana's leading analytics and trading platform.`,
     birdeye: `Track LAAM AI live on Birdeye — real-time price, charts, whale trades, and holder analytics at: birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT`,
     default:  `I can help with the mint address, how to buy LAAM, what tools are available, or the access tiers. What would you like to know?`
   };
