@@ -1,121 +1,55 @@
 const LAAM_MINT = "8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT";
-const SOL_RPC  = "https://api.mainnet-beta.solana.com";
 
-/* ===== LIVE STATS (Birdeye token API + DexScreener) ===== */
-// Fetch with timeout helper
-async function fetchWithTimeout(url, ms=8000){
-  const ctrl = new AbortController();
-  const tid = setTimeout(()=>ctrl.abort(), ms);
-  try{ const r = await fetch(url,{signal:ctrl.signal}); clearTimeout(tid); return r; }
-  catch(e){ clearTimeout(tid); throw e; }
+/* Point this at your deployed Render backend, e.g. "https://laam-ai-backend.onrender.com" */
+const LAAM_BACKEND_URL = window.LAAM_BACKEND_URL || 'https://laamai-1.onrender.com';
+
+function fmtUsd(n, decimals){
+  if (n === null || n === undefined) return '—';
+  return decimals !== undefined ? `$${n.toFixed(decimals)}` : `$${(n/1000).toFixed(1)}K`;
 }
 
-// Demo fallback data shown in preview/sandboxed environments
-function applyDemoStats(){
-  document.getElementById('sPrice').textContent   = '$0.0002673';
-  document.getElementById('sMcap').textContent    = 'Loading…';
-  document.getElementById('sLiq').textContent     = 'Loading…';
-  document.getElementById('sHolders').textContent = 'Loading…';
-  document.getElementById('hPrice').textContent   = '$0.0002673';
-  document.getElementById('hLiq').textContent     = '—';
-  document.getElementById('hHolders').textContent = '—';
-  const el = document.getElementById('sChange');
-  el.textContent = '+4.20%'; el.style.color = '#4ade80';
-  document.getElementById('sVol').textContent = '—';
-  // Show live badge to indicate data loads on real domain
-  document.querySelectorAll('.loading').forEach(e=>{
-    e.textContent='see chart ↑';e.style.fontSize='.68rem';e.style.color='var(--teal)';
-  });
-}
-
+/* ===== LIVE STATS — proxied through our backend (avoids browser CORS/rate-limit
+   blocks that public RPC/Birdeye endpoints impose on direct dApp calls) ===== */
 async function loadStats(){
-  let jupOk = false;
   try{
-    const jupRes = await fetchWithTimeout(`https://api.birdeye.so/tokens/v1/token/${LAAM_MINT}`);
-    const jup = await jupRes.json();
-    const price   = jup.usdPrice   ? `$${parseFloat(jup.usdPrice).toFixed(8)}`  : '—';
-    const mcap    = jup.mcap       ? `$${(jup.mcap/1000).toFixed(1)}K`           : '—';
-    const liq     = jup.liquidity  ? `$${(jup.liquidity/1000).toFixed(1)}K`      : '—';
-    const holders = jup.holderCount? jup.holderCount.toLocaleString()             : '—';
+    const res = await fetch(`${LAAM_BACKEND_URL}/api/market/stats`);
+    if(!res.ok) throw new Error(`Backend returned ${res.status}`);
+    const s = await res.json();
+
+    const price   = s.priceUsd !== null ? `$${s.priceUsd.toFixed(8)}` : '—';
+    const mcap    = fmtUsd(s.marketCapUsd);
+    const liq     = fmtUsd(s.liquidityUsd);
+    const vol     = fmtUsd(s.volume24hUsd);
+    const holders = s.holders !== null ? s.holders.toLocaleString() : '—';
+
     document.getElementById('sPrice').textContent   = price;
     document.getElementById('sMcap').textContent    = mcap;
     document.getElementById('sLiq').textContent     = liq;
     document.getElementById('sHolders').textContent = holders;
+    document.getElementById('sVol').textContent     = vol;
     document.getElementById('hPrice').textContent   = price;
     document.getElementById('hLiq').textContent     = liq;
     document.getElementById('hHolders').textContent = holders;
-    jupOk = true;
-  }catch(e){ /* will try DexScreener below */ }
 
-  try{
-    const dx = await (await fetchWithTimeout(`https://api.dexscreener.com/latest/dex/tokens/${LAAM_MINT}`)).json();
-    if(dx.pairs && dx.pairs.length){
-      const p = dx.pairs[0];
-      const vol = p.volume?.h24 ? `$${(p.volume.h24/1000).toFixed(1)}K` : '—';
-      const ch  = p.priceChange?.h24 !== undefined ? parseFloat(p.priceChange.h24) : null;
-      document.getElementById('sVol').textContent = vol;
-      if(ch !== null){
-        const el = document.getElementById('sChange');
-        el.textContent = (ch >= 0 ? '+' : '') + ch.toFixed(2) + '%';
-        el.style.color = ch >= 0 ? '#4ade80' : '#f87171';
-      }
-      // If Birdeye failed but DexScreener worked, fill price from here
-      if(!jupOk && p.priceUsd){
-        document.getElementById('sPrice').textContent = `$${parseFloat(p.priceUsd).toFixed(8)}`;
-        document.getElementById('hPrice').textContent = `$${parseFloat(p.priceUsd).toFixed(8)}`;
-      }
+    if(s.priceChange24h !== null){
+      const el = document.getElementById('sChange');
+      const ch = s.priceChange24h;
+      el.textContent = (ch >= 0 ? '+' : '') + ch.toFixed(2) + '%';
+      el.style.color = ch >= 0 ? '#4ade80' : '#f87171';
     }
-  }catch(e){ /* silent */ }
-
-  // If both failed (sandboxed preview), show demo values
-  if(!jupOk){
-    applyDemoStats();
+  }catch(e){
+    document.querySelectorAll('.loading').forEach(el=>{
+      el.textContent = 'unavailable'; el.style.fontSize = '.68rem'; el.style.color = 'var(--dim)';
+    });
   }
 }
 if (document.getElementById('sPrice')) loadStats();
 
-/* ===== WALLET TRACKER — REAL DATA (multi-RPC + Solscan fallback) ===== */
+/* ===== WALLET TRACKER — REAL DATA via our backend (server-side RPC call,
+   avoids the CORS/rate-limit blocks public Solana RPCs impose on browsers) ===== */
 const walletBtn = document.getElementById('walletBtn');
 const walletIn  = document.getElementById('walletIn');
 const walletOut = document.getElementById('walletOut');
-
-// Multiple public RPC endpoints — tries each until one works
-const RPC_ENDPOINTS = [
-  "https://api.mainnet-beta.solana.com",
-  "https://rpc.ankr.com/solana",
-  "https://solana-mainnet.g.alchemy.com/v2/demo",
-  "https://go.getblock.io/solana-mainnet",
-];
-
-async function rpcCall(endpoint, method, params){
-  const res = await fetch(endpoint, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({jsonrpc:'2.0', id:1, method, params})
-  });
-  const d = await res.json();
-  if(d.error) throw new Error(d.error.message);
-  if(d.result === undefined) throw new Error('No result');
-  return d.result;
-}
-
-// Try each RPC until success
-async function rpc(method, params){
-  let lastErr;
-  for(const ep of RPC_ENDPOINTS){
-    try{ return await rpcCall(ep, method, params); }
-    catch(e){ lastErr = e; }
-  }
-  throw lastErr;
-}
-
-// Solscan public API fallback for tx count + account info
-async function solscanAccount(addr){
-  const r = await fetch(`https://public-api.solscan.io/account/${addr}`, {
-    headers:{'accept':'application/json'}
-  });
-  return r.ok ? r.json() : null;
-}
 
 if (walletBtn) walletBtn.addEventListener('click', async () => {
   const addr = walletIn.value.trim();
@@ -130,40 +64,14 @@ if (walletBtn) walletBtn.addEventListener('click', async () => {
   walletOut.innerHTML = '<div class="scan-line"></div><div class="placeholder-msg">Scanning Solana blockchain…</div>';
 
   try{
-    // 1) SOL balance
-    const balResult = await rpc('getBalance', [addr]);
-    const solBalance = ((balResult.value ?? balResult) / 1e9).toFixed(4);
+    const res = await fetch(`${LAAM_BACKEND_URL}/api/wallet/${addr}`);
+    const snap = await res.json();
+    if(!res.ok) throw new Error(snap.error || `Request failed (${res.status})`);
 
-    // 2) LAAM AI token balance
-    let laamBalance = '0';
-    try{
-      const tokenResult = await rpc('getTokenAccountsByOwner', [
-        addr,
-        { mint: LAAM_MINT },
-        { encoding: 'jsonParsed' }
-      ]);
-      if(tokenResult.value && tokenResult.value.length){
-        const ui = tokenResult.value[0].account.data.parsed.info.tokenAmount.uiAmount;
-        laamBalance = ui !== null ? parseFloat(ui).toFixed(2) : '0';
-      }
-    }catch(e){ /* token account might not exist = 0 balance */ }
+    const solBalance = snap.solBalance.toFixed(4);
+    const laamBalance = snap.laamBalance.toFixed(2);
+    const laamNum = snap.laamBalance;
 
-    // 3) Recent transaction count via getSignaturesForAddress
-    let txCount = '0';
-    try{
-      const sigs = await rpc('getSignaturesForAddress', [addr, {limit:50}]);
-      txCount = sigs.length >= 50 ? '50+' : String(sigs.length);
-    }catch(e){}
-
-    // 4) Extra info from Solscan (non-blocking)
-    let solscanData = null;
-    try{ solscanData = await solscanAccount(addr); }catch(e){}
-
-    const totalTx = solscanData?.txCount
-      ? solscanData.txCount.toLocaleString()
-      : txCount;
-
-    const laamNum = parseFloat(laamBalance);
     const tierLabel =
       laamNum >= 50 ? '<span class="up">⭐ Tier 4 — Full Premium + API</span>'
     : laamNum >= 25 ? '<span class="up">🐋 Tier 3 — Whale Tracker</span>'
@@ -178,7 +86,7 @@ if (walletBtn) walletBtn.addEventListener('click', async () => {
       <div class="drow"><span>Address</span><b><a href="${solscanLink}" target="_blank" style="color:var(--teal)">${shortAddr} ↗</a></b></div>
       <div class="drow"><span>SOL Balance</span><b>${solBalance} SOL</b></div>
       <div class="drow"><span>LAAM AI Balance</span><b>${laamBalance} LAAM</b></div>
-      <div class="drow"><span>Total Transactions</span><b>${totalTx}</b></div>
+      <div class="drow"><span>Total Transactions</span><b>${snap.txCount}</b></div>
       <div class="drow"><span>Access Tier</span><b>${tierLabel}</b></div>
       <div class="drow"><span>Whale Status</span><b>${laamNum>=50 ? '<span class="up">⚡ Large holder</span>' : laamNum>0 ? '<span style="color:var(--teal)">Regular holder</span>' : '<span class="neutral">No LAAM held</span>'}</b></div>
     `;
@@ -188,30 +96,23 @@ if (walletBtn) walletBtn.addEventListener('click', async () => {
 });
 if (walletIn) walletIn.addEventListener('keydown', e => { if(e.key==='Enter') walletBtn.click(); });
 
-/* ===== MARKET ANALYSIS (DexScreener + Birdeye) ===== */
+/* ===== MARKET ANALYSIS — same backend-proxied stats used above ===== */
 const marketBtn = document.getElementById('marketBtn');
 const marketOut = document.getElementById('marketOut');
 
 if (marketBtn) marketBtn.addEventListener('click', async () => {
   marketOut.innerHTML = '<div class="scan-line"></div><div class="placeholder-msg">Pulling live market data…</div>';
   try{
-    const [jupRes, dxRes] = await Promise.all([
-      fetch(`https://api.birdeye.so/tokens/v1/token/${LAAM_MINT}`).then(r=>r.json()),
-      fetch(`https://api.dexscreener.com/latest/dex/tokens/${LAAM_MINT}`).then(r=>r.json())
-    ]);
+    const res = await fetch(`${LAAM_BACKEND_URL}/api/market/stats`);
+    const s = await res.json();
+    if(!res.ok) throw new Error(s.error || `Request failed (${res.status})`);
 
-    const price  = jupRes.usdPrice   ? `$${parseFloat(jupRes.usdPrice).toFixed(8)}` : '—';
-    const mcap   = jupRes.mcap       ? `$${(jupRes.mcap/1000).toFixed(2)}K`         : '—';
-    const liq    = jupRes.liquidity  ? `$${(jupRes.liquidity/1000).toFixed(2)}K`    : '—';
-    const holders= jupRes.holderCount? jupRes.holderCount.toLocaleString()           : '—';
-
-    let vol24='—', ch24=null, pairLabel='—';
-    if(dxRes.pairs && dxRes.pairs.length){
-      const pair = dxRes.pairs[0];
-      vol24 = pair.volume?.h24 ? `$${(pair.volume.h24/1000).toFixed(2)}K` : '—';
-      ch24  = pair.priceChange?.h24 !== undefined ? parseFloat(pair.priceChange.h24) : null;
-      pairLabel = 'Birdeye';
-    }
+    const price   = s.priceUsd !== null ? `$${s.priceUsd.toFixed(8)}` : '—';
+    const mcap    = fmtUsd(s.marketCapUsd);
+    const liq     = fmtUsd(s.liquidityUsd);
+    const vol24   = fmtUsd(s.volume24hUsd);
+    const holders = s.holders !== null ? s.holders.toLocaleString() : '—';
+    const ch24    = s.priceChange24h;
 
     const isUp = ch24 !== null ? ch24 >= 0 : true;
     const sentiment = ch24 === null ? 'Neutral' : isUp ? 'Bullish 🟢' : 'Cautious 🔴';
@@ -231,21 +132,7 @@ if (marketBtn) marketBtn.addEventListener('click', async () => {
       <div class="drow"><span>AI Sentiment</span><b class="${isUp?'up':'down'}">${sentiment}</b></div>
     `;
   } catch(err){
-    const isSandbox = err.message.includes('fetch') || err.message.includes('network') || err.message.includes('Failed');
-    if(isSandbox){
-      marketOut.innerHTML = `
-        <div class="drow"><span>Token</span><b>LAAM AI (Solana)</b></div>
-        <div class="drow"><span>Mint</span><b>8JdUW…JAKMT</b></div>
-        <div class="drow"><span>DEX</span><b>Birdeye</b></div>
-        <div class="market-bars">${Array.from({length:14},(_,i)=>`<i style="height:${Math.max(12,Math.floor(Math.random()*88)+10)}%"></i>`).join('')}</div>
-        <div class="drow"><span>Status</span><b><span class="up">✓ Code is correct</span></b></div>
-        <div class="drow"><span>Live data</span><b><span class="up">Works on GitHub Pages ✓</span></b></div>
-        <div class="drow"><span>APIs</span><b>Birdeye + DexScreener + Birdeye</b></div>
-        <div class="drow"><span>Live Chart</span><b><a href="https://birdeye.so/solana/token/8JdUWBFHVCjWgAKuSqVG5DwrGhpR3rwu4Z39HSJJAKMT" target="_blank" style="color:var(--teal)">Open Birdeye ↗</a></b></div>
-      `;
-    } else {
-      marketOut.innerHTML = `<div class="placeholder-msg">Could not fetch market data: ${err.message}</div>`;
-    }
+    marketOut.innerHTML = `<div class="placeholder-msg">Could not fetch market data: ${err.message}</div>`;
   }
 });
 

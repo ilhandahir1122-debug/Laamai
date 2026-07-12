@@ -12,6 +12,8 @@ const tokenRoutes = require('./routes/token.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const metadataRoutes = require('./routes/metadata.routes');
 const liquidityRoutes = require('./routes/liquidity.routes');
+const marketRoutes = require('./routes/market.routes');
+const walletRoutes = require('./routes/wallet.routes');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -31,6 +33,8 @@ app.use('/api/token', tokenRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/metadata', metadataRoutes);
 app.use('/api/liquidity', liquidityRoutes);
+app.use('/api/market', marketRoutes);
+app.use('/api/wallet', walletRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found.' });
