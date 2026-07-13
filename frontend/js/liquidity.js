@@ -16,6 +16,50 @@
   const ratioEl = document.getElementById('poolRatio');
   const tokenAmountEl = document.getElementById('liqTokenAmount');
   const solAmountEl = document.getElementById('liqSolAmount');
+  const mintEl = document.getElementById('liqMintAddr');
+  const mintHint = document.getElementById('mintLookupHint');
+  const tokenANameEl = document.getElementById('tokenAName');
+  const pairTitleEl = document.getElementById('poolPairTitle');
+
+  let resolvedSymbol = null;
+  let lookupTimer = null;
+
+  function resetTokenLookup() {
+    resolvedSymbol = null;
+    tokenANameEl.textContent = 'Your Token';
+    pairTitleEl.textContent = '';
+  }
+
+  async function lookupToken(mint) {
+    if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(mint)) {
+      resetTokenLookup();
+      return;
+    }
+    mintHint.textContent = 'Looking up token…';
+    try {
+      const info = await fetch(LAAM_BACKEND_URL + '/api/token/info/' + mint).then((r) => r.json());
+      if (info.error) throw new Error(info.error);
+      const label = info.name && info.symbol ? `${info.name} (${info.symbol})` : info.symbol || info.name || 'Unnamed token';
+      resolvedSymbol = info.symbol || info.name || 'TOKEN';
+      tokenANameEl.textContent = label;
+      pairTitleEl.textContent = `${resolvedSymbol} / SOL`;
+      mintHint.textContent = `Decimals: ${info.decimals}`;
+    } catch (err) {
+      resetTokenLookup();
+      mintHint.textContent = 'Could not find a token at this address — double-check the mint.';
+    }
+  }
+
+  mintEl.addEventListener('input', () => {
+    clearTimeout(lookupTimer);
+    const mint = mintEl.value.trim();
+    if (!mint) {
+      resetTokenLookup();
+      mintHint.textContent = "Paste your token's mint address — its name is looked up automatically on-chain.";
+      return;
+    }
+    lookupTimer = setTimeout(() => lookupToken(mint), 500);
+  });
 
   if (feeNote) {
     fetch(LAAM_BACKEND_URL + '/api/payment/fee-info')

@@ -19,7 +19,9 @@ const {
 const {
   createCreateMetadataAccountV3Instruction,
   PROGRAM_ID: TOKEN_METADATA_PROGRAM_ID,
+  Metadata,
 } = require('@metaplex-foundation/mpl-token-metadata');
+const { getMint } = require('@solana/spl-token');
 
 const RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
 const SERVICE_FEE_WALLET = process.env.SERVICE_FEE_WALLET || '';
@@ -35,6 +37,34 @@ function findMetadataPda(mint) {
     TOKEN_METADATA_PROGRAM_ID
   );
   return pda;
+}
+
+/** Looks up a token's on-chain name/symbol/decimals, e.g. to show "LAAM / SOL"
+ *  as soon as a user pastes a mint address instead of a bare address. */
+async function getTokenInfo(mintAddress) {
+  const connection = getConnection();
+  const mint = new PublicKey(mintAddress);
+
+  const mintInfo = await getMint(connection, mint);
+
+  let name = null;
+  let symbol = null;
+  try {
+    const metadataPda = findMetadataPda(mint);
+    const metadata = await Metadata.fromAccountAddress(connection, metadataPda);
+    name = metadata.data.name.replace(/\0/g, '').trim();
+    symbol = metadata.data.symbol.replace(/\0/g, '').trim();
+  } catch {
+    // No Metaplex metadata account — token exists but has no on-chain name/symbol.
+  }
+
+  return {
+    mint: mintAddress,
+    name,
+    symbol,
+    decimals: mintInfo.decimals,
+    supply: mintInfo.supply.toString(),
+  };
 }
 
 /** Adds a plain SOL transfer to the admin fee wallet inside the same transaction
@@ -187,6 +217,7 @@ module.exports = {
   buildRevokeAuthorityTransaction,
   addFeeInstruction,
   submitSignedTransaction,
+  getTokenInfo,
   SERVICE_FEE_WALLET,
   CREATE_TOKEN_FEE_SOL,
 };

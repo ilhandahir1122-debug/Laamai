@@ -53,14 +53,16 @@
     <div class="form-group">
       <label for="liqMintAddr">Token Mint Address</label>
       <input type="text" id="liqMintAddr" placeholder="Your token's mint address" required>
-      <span class="hint">The token you created — decimals are read automatically on-chain.</span>
+      <span class="hint" id="mintLookupHint">Paste your token's mint address — its name is looked up automatically on-chain.</span>
     </div>
+
+    <div class="pool-pair-title" id="poolPairTitle"></div>
 
     <div class="pool-pair">
       <div class="pool-token-card">
         <div class="pool-token-head">
           <span class="pool-token-badge">Token A</span>
-          <span class="pool-token-name">Your Token</span>
+          <span class="pool-token-name" id="tokenAName">Your Token</span>
         </div>
         <input type="number" id="liqTokenAmount" placeholder="e.g. 500000" min="0" step="any" required>
         <span class="hint">Amount of your token to deposit</span>

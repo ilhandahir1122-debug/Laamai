@@ -1,5 +1,5 @@
 const { PublicKey } = require('@solana/web3.js');
-const { buildCreateTokenTransaction, buildRevokeAuthorityTransaction } = require('../services/solana.service');
+const { buildCreateTokenTransaction, buildRevokeAuthorityTransaction, getTokenInfo } = require('../services/solana.service');
 
 function isValidPubkey(value) {
   try {
@@ -80,4 +80,17 @@ async function revokeTransaction(req, res, next) {
   }
 }
 
-module.exports = { createTransaction, revokeTransaction };
+async function getInfo(req, res, next) {
+  try {
+    const { mint } = req.params;
+    if (!mint || !isValidPubkey(mint)) {
+      return res.status(400).json({ error: 'A valid token mint address is required.' });
+    }
+    const info = await getTokenInfo(mint);
+    res.json(info);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { createTransaction, revokeTransaction, getInfo };

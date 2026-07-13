@@ -606,6 +606,10 @@ footer{
 .wallet-modal-tag{font-family:'Space Mono',monospace;font-size:.66rem;color:var(--dim);letter-spacing:.05em;text-transform:uppercase;}
 
 /* LIQUIDITY — 2-TOKEN POOL PAIR */
+.pool-pair-title{
+  text-align:center;font-family:'Orbitron',sans-serif;font-size:1.05rem;color:var(--teal);
+  min-height:1.4em;letter-spacing:.02em;
+}
 .pool-pair{display:flex;align-items:center;gap:14px;}
 .pool-token-card{
   flex:1;background:rgba(0,229,204,.04);border:1px solid var(--line);border-radius:14px;
