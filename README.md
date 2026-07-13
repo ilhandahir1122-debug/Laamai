@@ -52,7 +52,7 @@ with any static server) — `frontend/js/wallet.js` defaults
 - **Create Token** ([frontend/create-token.html](frontend/create-token.html)) — fully implemented: mints a real SPL token on mainnet-beta with Metaplex metadata.
 - **Revoke Authority** ([frontend/revoke.html](frontend/revoke.html)) — fully implemented: revokes mint/freeze authority on a token you control.
 - **Dashboard** ([frontend/dashboard.html](frontend/dashboard.html)) — fully implemented: lists SPL tokens in the connected wallet via live RPC calls.
-- **Add Liquidity** ([frontend/liquidity.html](frontend/liquidity.html)) — UI and API wired up, but `backend/services/raydium.service.js` is a stub (`501 Not Implemented`). Creating a real Raydium pool needs the Raydium SDK and costs several SOL in OpenBook market rent — worth testing on devnet first. See the TODO comment in that file.
+- **Add Liquidity** ([frontend/liquidity.html](frontend/liquidity.html)) — fully implemented: creates a real Raydium CPMM pool (token + SOL) via `@raydium-io/raydium-sdk-v2` (`backend/services/raydium.service.js`). No OpenBook market needed, so it costs a few hundredths of a SOL rather than several. Note the SDK package is still tagged `alpha` upstream — test with a small amount first.
 
 ## Metadata (logo) upload
 

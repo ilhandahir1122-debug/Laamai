@@ -604,3 +604,33 @@ footer{
 .wallet-modal-icon{font-size:1.3rem;width:28px;text-align:center;}
 .wallet-modal-name{flex:1;font-size:.9rem;font-weight:600;}
 .wallet-modal-tag{font-family:'Space Mono',monospace;font-size:.66rem;color:var(--dim);letter-spacing:.05em;text-transform:uppercase;}
+
+/* LIQUIDITY — 2-TOKEN POOL PAIR */
+.pool-pair{display:flex;align-items:center;gap:14px;}
+.pool-token-card{
+  flex:1;background:rgba(0,229,204,.04);border:1px solid var(--line);border-radius:14px;
+  padding:16px;display:flex;flex-direction:column;gap:8px;
+}
+.pool-token-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.pool-token-badge{
+  font-family:'Space Mono',monospace;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;
+  background:var(--teal-glow);border:1px solid var(--teal);color:var(--teal);padding:3px 10px;border-radius:999px;
+}
+.pool-token-badge.sol{background:rgba(153,69,255,.12);border-color:var(--sol);color:#c9a4ff;}
+.pool-token-name{font-size:.82rem;color:var(--dim);font-weight:600;}
+.pool-token-card input{width:100%;}
+.pool-pair-plus{
+  font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--teal);flex-shrink:0;
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;margin-top:20px;
+}
+.pool-ratio{
+  text-align:center;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--dim);
+  min-height:1.2em;
+}
+.pool-ratio b{color:var(--teal);}
+
+@media(max-width:640px){
+  .pool-pair{flex-direction:column;}
+  .pool-pair-plus{margin:0;transform:rotate(90deg);}
+}
