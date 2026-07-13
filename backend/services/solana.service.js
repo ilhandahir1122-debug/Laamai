@@ -156,11 +156,33 @@ async function buildRevokeAuthorityTransaction({ ownerAddress, mintAddress, revo
   return { transactionBase64: serialized.toString('base64') };
 }
 
+/**
+ * Submits a fully-signed transaction (built + signed entirely client-side by
+ * the user's wallet) and waits for confirmation. This runs server-to-server,
+ * which avoids the 403s public Solana RPC endpoints return for direct
+ * browser/mobile-app requests (they key off the Origin header, which
+ * server-to-server calls never send).
+ */
+async function submitSignedTransaction(signedTransactionBase64) {
+  const connection = getConnection();
+  const raw = Buffer.from(signedTransactionBase64, 'base64');
+  const tx = Transaction.from(raw);
+  const signature = await connection.sendRawTransaction(raw, { skipPreflight: false });
+  const lastValidBlockHeight =
+    tx.lastValidBlockHeight ?? (await connection.getLatestBlockhash('confirmed')).lastValidBlockHeight;
+  await connection.confirmTransaction(
+    { signature, blockhash: tx.recentBlockhash, lastValidBlockHeight },
+    'confirmed'
+  );
+  return signature;
+}
+
 module.exports = {
   getConnection,
   buildCreateTokenTransaction,
   buildRevokeAuthorityTransaction,
   addFeeInstruction,
+  submitSignedTransaction,
   SERVICE_FEE_WALLET,
   CREATE_TOKEN_FEE_SOL,
 };

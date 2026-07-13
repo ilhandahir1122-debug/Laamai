@@ -66,6 +66,17 @@ const WALLET_ADAPTERS = [
     url: 'https://trustwallet.com/',
     getProvider: () => window.trustwallet?.solana || null,
   },
+  {
+    id: 'okx',
+    name: 'OKX Wallet',
+    icon: '⬛',
+    url: 'https://www.okx.com/web3',
+    getProvider: () => window.okxwallet?.solana || null,
+    mobileDeepLink: () =>
+      `https://www.okx.com/download?deeplink=${encodeURIComponent(
+        `okx://wallet/dapp/url?dappUrl=${encodeURIComponent(window.location.href)}`
+      )}`,
+  },
 ];
 
 const LaamWallet = (() => {
@@ -320,14 +331,23 @@ function explorerAddrUrl(addr) {
   return `https://solscan.io/account/${addr}${LAAM_EXPLORER_CLUSTER}`;
 }
 
+function bytesToBase64(bytes) {
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+
+/* Signs locally with the wallet (private key never leaves the extension/app),
+   then hands the already-signed transaction to our backend to broadcast —
+   public Solana RPCs return 403 for direct browser/mobile-app submissions,
+   but accept them fine from our backend (server-to-server, no Origin header). */
 async function signAndSend(txBase64) {
   const solanaWeb3 = window.solanaWeb3;
-  const connection = new solanaWeb3.Connection(LAAM_SOLANA_RPC, 'confirmed');
   const tx = solanaWeb3.Transaction.from(base64ToBytes(txBase64));
   const signed = await LaamWallet.signTransaction(tx);
-  const sig = await connection.sendRawTransaction(signed.serialize());
-  await connection.confirmTransaction(sig, 'confirmed');
-  return sig;
+  const signedBase64 = bytesToBase64(signed.serialize());
+  const { signature } = await postJSON('/api/solana/submit', { transaction: signedBase64 });
+  return signature;
 }
 
 async function postJSON(path, body) {

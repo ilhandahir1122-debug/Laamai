@@ -14,6 +14,7 @@ const metadataRoutes = require('./routes/metadata.routes');
 const liquidityRoutes = require('./routes/liquidity.routes');
 const marketRoutes = require('./routes/market.routes');
 const walletRoutes = require('./routes/wallet.routes');
+const solanaRoutes = require('./routes/solana.routes');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -35,6 +36,7 @@ app.use('/api/metadata', metadataRoutes);
 app.use('/api/liquidity', liquidityRoutes);
 app.use('/api/market', marketRoutes);
 app.use('/api/wallet', walletRoutes);
+app.use('/api/solana', solanaRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found.' });
