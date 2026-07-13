@@ -1,6 +1,6 @@
+const crypto = require('crypto');
 const {
   Connection,
-  Keypair,
   PublicKey,
   SystemProgram,
   Transaction,
@@ -55,16 +55,20 @@ function addFeeInstruction(tx, ownerPubkey, feeSol) {
  * Builds an unsigned transaction that creates a new SPL token mint,
  * an associated token account for the owner, mints the initial supply,
  * and writes Metaplex on-chain metadata. feePayer = owner, so the owner's
- * wallet (Phantom) signs and pays for it client-side — this backend never
- * holds the owner's keys. The ephemeral mint keypair is generated here and
- * partial-signed because SystemProgram.createAccount requires the new
- * account's signature; its authority is set to the owner, not this key.
+ * wallet signs and pays for it client-side — this backend never holds the
+ * owner's keys. The mint account is derived deterministically from the
+ * owner's own pubkey + a random seed via createAccountWithSeed, so ONLY the
+ * owner needs to sign — no second (ephemeral keypair) signature is required.
+ * This avoids a real-world bug where some wallets (e.g. OKX) don't correctly
+ * preserve a pre-existing signature from a second signer when adding theirs,
+ * which corrupts the transaction and shows as "Unknown transaction" / a
+ * bogus "insufficient balance" warning.
  */
 async function buildCreateTokenTransaction({ ownerAddress, name, symbol, decimals, supply, uri }) {
   const connection = getConnection();
   const owner = new PublicKey(ownerAddress);
-  const mintKeypair = Keypair.generate();
-  const mint = mintKeypair.publicKey;
+  const seed = crypto.randomBytes(16).toString('hex').slice(0, 32);
+  const mint = await PublicKey.createWithSeed(owner, seed, TOKEN_PROGRAM_ID);
 
   const lamportsForMint = await getMinimumBalanceForRentExemptMint(connection);
   const ata = getAssociatedTokenAddressSync(mint, owner);
@@ -75,9 +79,11 @@ async function buildCreateTokenTransaction({ ownerAddress, name, symbol, decimal
   const tx = new Transaction();
 
   tx.add(
-    SystemProgram.createAccount({
+    SystemProgram.createAccountWithSeed({
       fromPubkey: owner,
       newAccountPubkey: mint,
+      basePubkey: owner,
+      seed,
       space: MINT_SIZE,
       lamports: lamportsForMint,
       programId: TOKEN_PROGRAM_ID,
@@ -117,8 +123,6 @@ async function buildCreateTokenTransaction({ ownerAddress, name, symbol, decimal
   tx.recentBlockhash = blockhash;
   tx.lastValidBlockHeight = lastValidBlockHeight;
   tx.feePayer = owner;
-
-  tx.partialSign(mintKeypair);
 
   const serialized = tx.serialize({ requireAllSignatures: false, verifySignatures: false });
   return { transactionBase64: serialized.toString('base64'), mint: mint.toBase58() };
