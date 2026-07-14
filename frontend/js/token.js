@@ -86,7 +86,7 @@
       }
 
       setStatus(statusEl, 'info', 'Building transaction…');
-      const { transaction, mint } = await postJSON('/api/token/create-transaction', {
+      const { transaction, mint, estimatedCostSol } = await postJSON('/api/token/create-transaction', {
         owner,
         name,
         symbol,
@@ -95,7 +95,13 @@
         uri,
       });
 
-      setStatus(statusEl, 'info', 'Confirm the transaction in Phantom…');
+      const proceed = await confirmCost(statusEl, estimatedCostSol);
+      if (!proceed) {
+        setStatus(statusEl, 'info', 'Cancelled — no transaction was sent.');
+        return;
+      }
+
+      setStatus(statusEl, 'info', 'Confirm the transaction in your wallet…');
       const sig = await signAndSend(transaction);
 
       setStatus(statusEl, 'success', `Token created! Transaction confirmed.`);

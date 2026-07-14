@@ -324,6 +324,29 @@ function setStatus(el, type, html) {
   el.innerHTML = html;
 }
 
+/* Shows the total SOL a transaction will cost and waits for the user to
+   explicitly continue (or cancel) before signing — so "how much do I need"
+   is answered up front instead of discovered mid-signature in the wallet. */
+function confirmCost(statusEl, costSol, breakdownHtml) {
+  return new Promise((resolve) => {
+    statusEl.className = 'status-box show info';
+    const costLine =
+      costSol !== null && costSol !== undefined
+        ? `<b>Estimated total cost: ${costSol.toFixed(5)} SOL</b>`
+        : `<b>Could not calculate an exact total</b> — your wallet balance may be too low to preview. Make sure you have enough SOL before continuing.`;
+    statusEl.innerHTML = `
+      <div style="margin-bottom:8px;">${costLine}</div>
+      ${breakdownHtml || ''}
+      <div style="display:flex;gap:10px;margin-top:12px;">
+        <button type="button" class="btn-submit" id="costConfirmBtn" style="padding:9px 20px;font-size:.82rem;">Continue → Sign in Wallet</button>
+        <button type="button" class="btn-wallet" id="costCancelBtn" style="padding:9px 20px;font-size:.82rem;background:transparent;border:1px solid var(--line);color:var(--dim);">Cancel</button>
+      </div>
+    `;
+    document.getElementById('costConfirmBtn').addEventListener('click', () => resolve(true));
+    document.getElementById('costCancelBtn').addEventListener('click', () => resolve(false));
+  });
+}
+
 function explorerTxUrl(sig) {
   return `https://solscan.io/tx/${sig}${LAAM_EXPLORER_CLUSTER}`;
 }

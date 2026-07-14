@@ -1,5 +1,9 @@
 /* ===== ADD LIQUIDITY =====
-   Creates a real Raydium CPMM pool pairing your token with SOL.
+   Creates a real Meteora DAMM v2 pool pairing your token with SOL. Meteora
+   charges no protocol fee for pool creation (unlike some other DEXs) — you
+   only pay Solana rent, plus our platform fee. The liquidity position is
+   permanently locked the moment the pool is created (isLockLiquidity), so
+   there's no separate "lock" step and no way for anyone to ever pull it out.
    Same non-custodial pattern as everywhere else: the backend builds an
    unsigned transaction (feePayer = your wallet), your wallet signs it
    locally, and the backend relays the already-signed transaction to Solana
@@ -66,7 +70,7 @@
       .then((r) => r.json())
       .then((info) => {
         if (info.liquidityFeeSol > 0) {
-          feeNote.textContent = `Includes a ${info.liquidityFeeSol} SOL platform fee, plus normal Solana network fees.`;
+          feeNote.textContent = `Includes a ${info.liquidityFeeSol} SOL platform fee, plus Solana rent + network fees. Meteora itself charges no pool creation fee.`;
         }
       })
       .catch(() => {});
@@ -105,74 +109,35 @@
     submitBtn.disabled = true;
     try {
       setStatus(statusEl, 'info', 'Building pool creation transaction…');
-      const { transaction, poolId } = await postJSON('/api/liquidity/create-pool', {
+      const { transaction, poolId, estimatedCostSol } = await postJSON('/api/liquidity/create-pool', {
         owner,
         mint,
         tokenAmount,
         solAmount,
       });
 
+      const breakdown = `
+        <div class="pool-ratio" style="text-align:left;">
+          <div class="result-row"><span>Your SOL deposit</span><span>${solAmount} SOL</span></div>
+          <div class="result-row"><span>Meteora pool creation fee</span><span>0 SOL (free)</span></div>
+          <div class="result-row"><span>Rent + network + platform fee</span><span>~${(estimatedCostSol - Number(solAmount)).toFixed(5)} SOL</span></div>
+        </div>
+      `;
+      const proceed = await confirmCost(statusEl, estimatedCostSol, breakdown);
+      if (!proceed) {
+        setStatus(statusEl, 'info', 'Cancelled — no transaction was sent.');
+        return;
+      }
+
       setStatus(statusEl, 'info', 'Confirm the transaction in your wallet…');
       const sig = await signAndSend(transaction);
 
-      setStatus(statusEl, 'success', 'Pool created! It may take a minute to appear on Raydium/Jupiter.');
+      setStatus(statusEl, 'success', 'Pool created and liquidity locked permanently! It may take a minute to appear on DexScreener/Jupiter.');
       resultEl.style.display = 'block';
       resultEl.innerHTML = `
         <div class="result-row"><span>Pool ID</span><span>${poolId}</span></div>
         <div class="result-row"><span>Transaction</span><span><a href="${explorerTxUrl(sig)}" target="_blank">${sig.slice(0, 12)}… ↗</a></span></div>
-        <div class="result-row"><span>View on Raydium</span><span><a href="https://raydium.io/liquidity-pools/?token=${encodeURIComponent(mint)}" target="_blank">Open ↗</a></span></div>
-      `;
-
-      const lockPoolIdEl = document.getElementById('lockPoolId');
-      if (lockPoolIdEl) lockPoolIdEl.value = poolId;
-    } catch (err) {
-      setStatus(statusEl, 'error', `⚠️ ${err.message}`);
-    } finally {
-      submitBtn.disabled = false;
-    }
-  });
-})();
-
-/* ===== LOCK LIQUIDITY ===== */
-(function initLockLiquidity() {
-  const form = document.getElementById('lockLiquidityForm');
-  if (!form) return;
-
-  const statusEl = document.getElementById('lockStatus');
-  const resultEl = document.getElementById('lockResult');
-  const submitBtn = document.getElementById('lockSubmitBtn');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    resultEl.style.display = 'none';
-    const owner = LaamWallet.getPublicKey();
-    if (!owner) {
-      setStatus(statusEl, 'error', 'Connect your wallet first.');
-      return;
-    }
-
-    const poolId = document.getElementById('lockPoolId').value.trim();
-    if (!poolId) {
-      setStatus(statusEl, 'error', 'Enter the pool ID.');
-      return;
-    }
-    if (!confirm('This permanently locks 100% of your LP tokens for this pool. This cannot be undone. Continue?')) {
-      return;
-    }
-
-    submitBtn.disabled = true;
-    try {
-      setStatus(statusEl, 'info', 'Building lock transaction…');
-      const { transaction, nftMint } = await postJSON('/api/liquidity/lock-pool', { owner, poolId });
-
-      setStatus(statusEl, 'info', 'Confirm the transaction in your wallet…');
-      const sig = await signAndSend(transaction);
-
-      setStatus(statusEl, 'success', 'Liquidity locked permanently.');
-      resultEl.style.display = 'block';
-      resultEl.innerHTML = `
-        <div class="result-row"><span>Lock Receipt (NFT)</span><span>${nftMint}</span></div>
-        <div class="result-row"><span>Transaction</span><span><a href="${explorerTxUrl(sig)}" target="_blank">${sig.slice(0, 12)}… ↗</a></span></div>
+        <div class="result-row"><span>View on DexScreener</span><span><a href="https://dexscreener.com/solana/${encodeURIComponent(poolId)}" target="_blank">Open ↗</a></span></div>
       `;
     } catch (err) {
       setStatus(statusEl, 'error', `⚠️ ${err.message}`);

@@ -1,8 +1,16 @@
 const { Raydium, TxVersion, parseTokenAccountResp } = require('@raydium-io/raydium-sdk-v2');
+const { CpmmPoolInfoLayout } = require('@raydium-io/raydium-sdk-v2/lib/raydium/cpmm/layout.js');
 const { PublicKey, Keypair } = require('@solana/web3.js');
-const { NATIVE_MINT, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, getMint } = require('@solana/spl-token');
+const {
+  NATIVE_MINT,
+  TOKEN_PROGRAM_ID,
+  TOKEN_2022_PROGRAM_ID,
+  getMint,
+  getMinimumBalanceForRentExemptMint,
+  getMinimumBalanceForRentExemptAccount,
+} = require('@solana/spl-token');
 const BN = require('bn.js');
-const { getConnection, addFeeInstruction } = require('./solana.service');
+const { getConnection, addFeeInstruction, estimateOwnerCostSol } = require('./solana.service');
 
 // Mainnet Raydium CPMM program (no OpenBook market needed, unlike the legacy AMM v4 —
 // this is why a pool can be created for a few hundredths of a SOL instead of several SOL).
@@ -31,6 +39,33 @@ async function primeOwnerTokenAccounts(raydium, connection, owner) {
     },
   });
   raydium.account.updateTokenAccount({ tokenAccounts, tokenAccountRawInfos });
+}
+
+/**
+ * Deterministic fallback used only when live simulation can't run (the
+ * owner's current balance is already too low for the simulator to finish).
+ * Sums the pieces we know exactly — LP mint + 2 vault accounts + pool state
+ * rent, Raydium's own protocol fee for creating a pool, our platform fee,
+ * one signature's network fee, and the SOL amount being deposited — so a
+ * wallet that's short still sees a concrete number instead of nothing.
+ * Slightly conservative: Raydium's "observation" account rent isn't in this
+ * sum (its size isn't exposed by the SDK), so add a small buffer mentally.
+ */
+async function estimateCreatePoolCostSolFallback({ connection, solAmount, createPoolFeeLamports }) {
+  const [mintRent, vaultRent] = await Promise.all([
+    getMinimumBalanceForRentExemptMint(connection),
+    getMinimumBalanceForRentExemptAccount(connection),
+  ]);
+  const poolStateRent = await connection.getMinimumBalanceForRentExemption(CpmmPoolInfoLayout.span);
+
+  const feeLamports = Math.round(LIQUIDITY_FEE_SOL * 1e9);
+  const networkFeeLamports = 5000;
+  const depositLamports = Math.round(solAmount * 1e9);
+
+  const totalLamports =
+    mintRent + vaultRent * 2 + poolStateRent + createPoolFeeLamports + feeLamports + networkFeeLamports + depositLamports;
+
+  return totalLamports / 1e9;
 }
 
 /**
@@ -90,10 +125,21 @@ async function buildCreateLiquidityPoolTransaction({ ownerAddress, mintAddress, 
   transaction.recentBlockhash = blockhash;
   transaction.lastValidBlockHeight = lastValidBlockHeight;
 
+  let estimatedCostSol = await estimateOwnerCostSol(connection, transaction, owner);
+  if (estimatedCostSol === null) {
+    estimatedCostSol = await estimateCreatePoolCostSolFallback({
+      connection,
+      solAmount,
+      createPoolFeeLamports: Number(feeConfigs[0].createPoolFee),
+    });
+  }
+
   const serialized = transaction.serialize({ requireAllSignatures: false, verifySignatures: false });
   return {
     transactionBase64: serialized.toString('base64'),
     poolId: extInfo.address.poolId.toBase58(),
+    estimatedCostSol,
+    raydiumProtocolFeeSol: Number(feeConfigs[0].createPoolFee) / 1e9,
   };
 }
 
@@ -153,10 +199,13 @@ async function buildLockLiquidityTransaction({ ownerAddress, poolId }) {
   transaction.lastValidBlockHeight = lastValidBlockHeight;
   transaction.partialSign(nftMintKeypair);
 
+  const estimatedCostSol = await estimateOwnerCostSol(connection, transaction, owner);
+
   const serialized = transaction.serialize({ requireAllSignatures: false, verifySignatures: false });
   return {
     transactionBase64: serialized.toString('base64'),
     nftMint: extInfo.nftMint.toBase58(),
+    estimatedCostSol,
   };
 }
 

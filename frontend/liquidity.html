@@ -31,7 +31,7 @@
   <div class="app-head">
     <span class="stag">Liquidity</span>
     <h1>Add Liquidity</h1>
-    <p>Create a Raydium CPMM pool pairing your token with SOL, so it becomes tradable on Raydium/Jupiter. You deposit both sides of the pool from your own wallet and set the starting price.</p>
+    <p>Create a Meteora pool pairing your token with SOL, so it becomes tradable and shows up on DexScreener/Jupiter automatically. Meteora charges no protocol fee to create a pool (unlike some DEXs) — you only pay Solana rent. Your liquidity is <strong>permanently locked the moment the pool is created</strong> — proof to your community it can never be pulled ("no rug"), no separate step needed.</p>
   </div>
 
   <div class="app-nav-links">
@@ -85,7 +85,7 @@
     <div class="hint" id="feeNote" style="text-align:center;"></div>
 
     <div class="status-box show info" style="margin-top:0;">
-      ⚠️ This creates a <strong>real, permanent</strong> Raydium pool with real SOL — there is no "undo". Both amounts are locked into the pool at the ratio you set, which becomes the starting price. Double-check everything before confirming in your wallet.
+      ⚠️ This creates a <strong>real, permanent</strong> pool with real SOL, and the liquidity is locked forever the instant it's created — there is no "undo" and no way to withdraw it later, ever. Both amounts are locked into the pool at the ratio you set, which becomes the starting price. Double-check everything before confirming in your wallet.
     </div>
 
     <div class="form-actions">
@@ -95,26 +95,6 @@
 
   <div class="status-box" id="liquidityStatus"></div>
   <div class="result-card" id="liquidityResult" style="display:none;"></div>
-
-  <div class="app-head" style="margin-top:60px;">
-    <span class="stag">Trust &amp; Safety</span>
-    <h1>Lock Liquidity</h1>
-    <p>Permanently lock 100% of your LP tokens for a pool you created — proof to your community that liquidity can never be pulled ("no rug"). This is irreversible.</p>
-  </div>
-
-  <form class="form-card" id="lockLiquidityForm">
-    <div class="form-group">
-      <label for="lockPoolId">Pool ID</label>
-      <input type="text" id="lockPoolId" placeholder="The pool ID from Add Liquidity above" required>
-      <span class="hint">Locks every LP token this wallet holds for the pool — there is no partial lock.</span>
-    </div>
-    <div class="form-actions">
-      <button type="submit" class="btn-submit" id="lockSubmitBtn">Lock Liquidity</button>
-    </div>
-  </form>
-
-  <div class="status-box" id="lockStatus"></div>
-  <div class="result-card" id="lockResult" style="display:none;"></div>
 </main>
 
 <script src="https://unpkg.com/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>

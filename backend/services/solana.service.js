@@ -20,8 +20,9 @@ const {
   createCreateMetadataAccountV3Instruction,
   PROGRAM_ID: TOKEN_METADATA_PROGRAM_ID,
   Metadata,
+  Key: MetadataKey,
 } = require('@metaplex-foundation/mpl-token-metadata');
-const { getMint } = require('@solana/spl-token');
+const { getMint, ACCOUNT_SIZE, getMinimumBalanceForRentExemptAccount } = require('@solana/spl-token');
 
 const RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
 const SERVICE_FEE_WALLET = process.env.SERVICE_FEE_WALLET || '';
@@ -65,6 +66,59 @@ async function getTokenInfo(mintAddress) {
     decimals: mintInfo.decimals,
     supply: mintInfo.supply.toString(),
   };
+}
+
+/**
+ * Best-effort SOL cost estimate via simulation — diffs the owner's balance
+ * before/after. Only accurate when the owner already has enough SOL for the
+ * simulation to fully succeed (a wallet that's short will make the sim fail
+ * partway through and return null) — used for Raydium instructions we don't
+ * construct ourselves, so we can't sum their rent costs directly. For token
+ * creation, which we build instruction-by-instruction, see
+ * estimateCreateTokenCostSol below instead — it's exact regardless of balance.
+ */
+async function estimateOwnerCostSol(connection, transaction, owner) {
+  try {
+    const preBalance = await connection.getBalance(owner);
+    // Legacy Transaction overload takes positional args, not a config object:
+    // (transaction, signers?, includeAccounts?) — no signers means sigVerify is skipped.
+    const sim = await connection.simulateTransaction(transaction, undefined, [owner]);
+    if (sim.value.err) return null;
+    const postAccount = sim.value.accounts?.[0];
+    const postBalance = postAccount ? postAccount.lamports : preBalance;
+    return (preBalance - postBalance) / 1e9;
+  } catch {
+    return null;
+  }
+}
+
+/** Exact SOL cost to create a token — sums real rent-exemption minimums for
+ *  every new account plus the platform fee and the one signature's network
+ *  fee. Computed the same way regardless of the caller's current balance,
+ *  so it works even for a wallet with 0 SOL (e.g. before they've funded it). */
+async function estimateCreateTokenCostSol({ connection, owner, mint, name, symbol, uri, mintRentLamports }) {
+  const ataRent = await getMinimumBalanceForRentExemptAccount(connection);
+
+  const metadataArgs = {
+    key: MetadataKey.MetadataV1,
+    updateAuthority: owner,
+    mint,
+    data: { name, symbol, uri, sellerFeeBasisPoints: 0, creators: null },
+    primarySaleHappened: false,
+    isMutable: true,
+    editionNonce: null,
+    tokenStandard: null,
+    collection: null,
+    uses: null,
+    collectionDetails: null,
+    programmableConfig: null,
+  };
+  const metadataRent = await Metadata.getMinimumBalanceForRentExemption(metadataArgs, connection);
+
+  const feeLamports = Math.round(CREATE_TOKEN_FEE_SOL * 1e9);
+  const networkFeeLamports = 5000; // one signature (owner) at the standard 5000 lamports/sig
+
+  return (mintRentLamports + ataRent + metadataRent + feeLamports + networkFeeLamports) / 1e9;
 }
 
 /** Adds a plain SOL transfer to the admin fee wallet inside the same transaction
@@ -154,8 +208,18 @@ async function buildCreateTokenTransaction({ ownerAddress, name, symbol, decimal
   tx.lastValidBlockHeight = lastValidBlockHeight;
   tx.feePayer = owner;
 
+  const estimatedCostSol = await estimateCreateTokenCostSol({
+    connection,
+    owner,
+    mint,
+    name,
+    symbol,
+    uri,
+    mintRentLamports: lamportsForMint,
+  });
+
   const serialized = tx.serialize({ requireAllSignatures: false, verifySignatures: false });
-  return { transactionBase64: serialized.toString('base64'), mint: mint.toBase58() };
+  return { transactionBase64: serialized.toString('base64'), mint: mint.toBase58(), estimatedCostSol };
 }
 
 /**
@@ -218,6 +282,7 @@ module.exports = {
   addFeeInstruction,
   submitSignedTransaction,
   getTokenInfo,
+  estimateOwnerCostSol,
   SERVICE_FEE_WALLET,
   CREATE_TOKEN_FEE_SOL,
 };

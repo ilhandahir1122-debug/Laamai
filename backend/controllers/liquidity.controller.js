@@ -1,5 +1,6 @@
 const { PublicKey } = require('@solana/web3.js');
-const { buildCreateLiquidityPoolTransaction, buildLockLiquidityTransaction } = require('../services/raydium.service');
+const { buildCreateMeteoraPoolTransaction } = require('../services/meteora.service');
+const { buildLockLiquidityTransaction } = require('../services/raydium.service');
 
 function isValidPubkey(value) {
   try {
@@ -29,14 +30,14 @@ async function createPool(req, res, next) {
       return res.status(400).json({ error: 'solAmount must be a positive number.' });
     }
 
-    const { transactionBase64, poolId } = await buildCreateLiquidityPoolTransaction({
+    const { transactionBase64, poolId, estimatedCostSol } = await buildCreateMeteoraPoolTransaction({
       ownerAddress: owner,
       mintAddress: mint,
       tokenAmount: tAmount,
       solAmount: sAmount,
     });
 
-    res.json({ transaction: transactionBase64, poolId });
+    res.json({ transaction: transactionBase64, poolId, estimatedCostSol, autoLocked: true });
   } catch (err) {
     next(err);
   }
@@ -53,12 +54,12 @@ async function lockPool(req, res, next) {
       return res.status(400).json({ error: 'A valid pool ID is required.' });
     }
 
-    const { transactionBase64, nftMint } = await buildLockLiquidityTransaction({
+    const { transactionBase64, nftMint, estimatedCostSol } = await buildLockLiquidityTransaction({
       ownerAddress: owner,
       poolId,
     });
 
-    res.json({ transaction: transactionBase64, nftMint });
+    res.json({ transaction: transactionBase64, nftMint, estimatedCostSol });
   } catch (err) {
     next(err);
   }

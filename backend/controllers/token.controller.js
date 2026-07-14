@@ -38,7 +38,7 @@ async function createTransaction(req, res, next) {
       return res.status(400).json({ error: 'A metadata URI is required.' });
     }
 
-    const { transactionBase64, mint } = await buildCreateTokenTransaction({
+    const { transactionBase64, mint, estimatedCostSol } = await buildCreateTokenTransaction({
       ownerAddress: owner,
       name,
       symbol,
@@ -47,7 +47,7 @@ async function createTransaction(req, res, next) {
       uri,
     });
 
-    res.json({ transaction: transactionBase64, mint });
+    res.json({ transaction: transactionBase64, mint, estimatedCostSol });
   } catch (err) {
     next(err);
   }
