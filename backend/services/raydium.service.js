@@ -1,5 +1,5 @@
 const { Raydium, TxVersion, parseTokenAccountResp } = require('@raydium-io/raydium-sdk-v2');
-const { PublicKey } = require('@solana/web3.js');
+const { PublicKey, Keypair } = require('@solana/web3.js');
 const { NATIVE_MINT, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, getMint } = require('@solana/spl-token');
 const BN = require('bn.js');
 const { getConnection, addFeeInstruction } = require('./solana.service');
@@ -97,4 +97,67 @@ async function buildCreateLiquidityPoolTransaction({ ownerAddress, mintAddress, 
   };
 }
 
-module.exports = { buildCreateLiquidityPoolTransaction };
+/**
+ * Builds an unsigned transaction that permanently locks 100% of the owner's
+ * LP tokens for a pool — proof the liquidity can never be pulled (no rug).
+ * Raydium's lock program mints a small "position NFT" as a receipt, which
+ * needs a fresh keypair to sign the mint's creation (unlike our own token
+ * mint, this is Raydium's own program design, not something we control) —
+ * generated here and partial-signed server-side, same safe pattern used
+ * before: the ephemeral key's only power is naming that one account, its
+ * authority belongs to Raydium's lock program, and it's discarded after use.
+ */
+async function buildLockLiquidityTransaction({ ownerAddress, poolId }) {
+  const connection = getConnection();
+  const owner = new PublicKey(ownerAddress);
+
+  const raydium = await Raydium.load({
+    owner,
+    connection,
+    cluster: 'mainnet',
+    disableFeatureCheck: true,
+    disableLoadToken: true,
+    blockhashCommitment: 'confirmed',
+  });
+
+  await primeOwnerTokenAccounts(raydium, connection, owner);
+
+  let poolInfo;
+  try {
+    ({ poolInfo } = await raydium.cpmm.getPoolInfoFromRpc(poolId));
+  } catch {
+    const err = new Error('No Raydium pool found for that pool ID.');
+    err.status = 400;
+    throw err;
+  }
+  const lpBalance = raydium.account.tokenAccounts.find((a) => a.mint.toBase58() === poolInfo.lpMint.address);
+  if (!lpBalance || lpBalance.amount.isZero()) {
+    const err = new Error("This wallet doesn't hold any LP tokens for that pool.");
+    err.status = 400;
+    throw err;
+  }
+
+  const nftMintKeypair = Keypair.generate();
+
+  const { transaction, extInfo } = await raydium.cpmm.lockLp({
+    poolInfo,
+    lpAmount: lpBalance.amount,
+    withMetadata: true,
+    txVersion: TxVersion.LEGACY,
+    getEphemeralSigners: async () => [nftMintKeypair.publicKey],
+  });
+
+  transaction.feePayer = owner;
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
+  transaction.recentBlockhash = blockhash;
+  transaction.lastValidBlockHeight = lastValidBlockHeight;
+  transaction.partialSign(nftMintKeypair);
+
+  const serialized = transaction.serialize({ requireAllSignatures: false, verifySignatures: false });
+  return {
+    transactionBase64: serialized.toString('base64'),
+    nftMint: extInfo.nftMint.toBase58(),
+  };
+}
+
+module.exports = { buildCreateLiquidityPoolTransaction, buildLockLiquidityTransaction };

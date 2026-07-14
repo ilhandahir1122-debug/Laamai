@@ -122,6 +122,58 @@
         <div class="result-row"><span>Transaction</span><span><a href="${explorerTxUrl(sig)}" target="_blank">${sig.slice(0, 12)}… ↗</a></span></div>
         <div class="result-row"><span>View on Raydium</span><span><a href="https://raydium.io/liquidity-pools/?token=${encodeURIComponent(mint)}" target="_blank">Open ↗</a></span></div>
       `;
+
+      const lockPoolIdEl = document.getElementById('lockPoolId');
+      if (lockPoolIdEl) lockPoolIdEl.value = poolId;
+    } catch (err) {
+      setStatus(statusEl, 'error', `⚠️ ${err.message}`);
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+})();
+
+/* ===== LOCK LIQUIDITY ===== */
+(function initLockLiquidity() {
+  const form = document.getElementById('lockLiquidityForm');
+  if (!form) return;
+
+  const statusEl = document.getElementById('lockStatus');
+  const resultEl = document.getElementById('lockResult');
+  const submitBtn = document.getElementById('lockSubmitBtn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    resultEl.style.display = 'none';
+    const owner = LaamWallet.getPublicKey();
+    if (!owner) {
+      setStatus(statusEl, 'error', 'Connect your wallet first.');
+      return;
+    }
+
+    const poolId = document.getElementById('lockPoolId').value.trim();
+    if (!poolId) {
+      setStatus(statusEl, 'error', 'Enter the pool ID.');
+      return;
+    }
+    if (!confirm('This permanently locks 100% of your LP tokens for this pool. This cannot be undone. Continue?')) {
+      return;
+    }
+
+    submitBtn.disabled = true;
+    try {
+      setStatus(statusEl, 'info', 'Building lock transaction…');
+      const { transaction, nftMint } = await postJSON('/api/liquidity/lock-pool', { owner, poolId });
+
+      setStatus(statusEl, 'info', 'Confirm the transaction in your wallet…');
+      const sig = await signAndSend(transaction);
+
+      setStatus(statusEl, 'success', 'Liquidity locked permanently.');
+      resultEl.style.display = 'block';
+      resultEl.innerHTML = `
+        <div class="result-row"><span>Lock Receipt (NFT)</span><span>${nftMint}</span></div>
+        <div class="result-row"><span>Transaction</span><span><a href="${explorerTxUrl(sig)}" target="_blank">${sig.slice(0, 12)}… ↗</a></span></div>
+      `;
     } catch (err) {
       setStatus(statusEl, 'error', `⚠️ ${err.message}`);
     } finally {

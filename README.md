@@ -52,7 +52,12 @@ with any static server) — `frontend/js/wallet.js` defaults
 - **Create Token** ([frontend/create-token.html](frontend/create-token.html)) — fully implemented: mints a real SPL token on mainnet-beta with Metaplex metadata.
 - **Revoke Authority** ([frontend/revoke.html](frontend/revoke.html)) — fully implemented: revokes mint/freeze authority on a token you control.
 - **Dashboard** ([frontend/dashboard.html](frontend/dashboard.html)) — fully implemented: lists SPL tokens in the connected wallet via live RPC calls.
-- **Add Liquidity** ([frontend/liquidity.html](frontend/liquidity.html)) — fully implemented: creates a real Raydium CPMM pool (token + SOL) via `@raydium-io/raydium-sdk-v2` (`backend/services/raydium.service.js`). No OpenBook market needed, so it costs a few hundredths of a SOL rather than several. Note the SDK package is still tagged `alpha` upstream — test with a small amount first.
+- **Add Liquidity** ([frontend/liquidity.html](frontend/liquidity.html)) — fully implemented: creates a real Raydium CPMM pool (token + SOL) via `@raydium-io/raydium-sdk-v2` (`backend/services/raydium.service.js`). No OpenBook market needed, so it costs a few hundredths of a SOL rather than several. Also auto-resolves the token's name/symbol from its mint address (`GET /api/token/info/:mint`). Note the SDK package is still tagged `alpha` upstream — test with a small amount first.
+- **Lock Liquidity** (same page, below Add Liquidity) — fully implemented: permanently locks 100% of the connected wallet's LP tokens for a pool via Raydium's lock program, minting a receipt NFT. Irreversible by design ("no rug" proof).
+
+## What's not built (and why)
+
+A pump.fun-style **bonding curve** (buy/sell before any real liquidity pool exists, automatic "graduation" into a pool once a threshold is hit, per-trade creator fee) needs its own custom on-chain Solana program — that's a different category of work from everything else here (which only calls existing, audited programs: SPL Token, Metaplex, Raydium). Writing and deploying a program that escrows real user funds carries real risk if it has bugs, and normally goes through a paid security audit before touching mainnet. Out of scope here; DexScreener/Jupiter pick up any real Raydium pool automatically once it exists, no extra integration needed.
 
 ## Metadata (logo) upload
 

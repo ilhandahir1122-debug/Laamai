@@ -1,5 +1,5 @@
 const { PublicKey } = require('@solana/web3.js');
-const { buildCreateLiquidityPoolTransaction } = require('../services/raydium.service');
+const { buildCreateLiquidityPoolTransaction, buildLockLiquidityTransaction } = require('../services/raydium.service');
 
 function isValidPubkey(value) {
   try {
@@ -42,4 +42,26 @@ async function createPool(req, res, next) {
   }
 }
 
-module.exports = { createPool };
+async function lockPool(req, res, next) {
+  try {
+    const { owner, poolId } = req.body;
+
+    if (!owner || !isValidPubkey(owner)) {
+      return res.status(400).json({ error: 'A valid owner wallet address is required.' });
+    }
+    if (!poolId || !isValidPubkey(poolId)) {
+      return res.status(400).json({ error: 'A valid pool ID is required.' });
+    }
+
+    const { transactionBase64, nftMint } = await buildLockLiquidityTransaction({
+      ownerAddress: owner,
+      poolId,
+    });
+
+    res.json({ transaction: transactionBase64, nftMint });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { createPool, lockPool };
